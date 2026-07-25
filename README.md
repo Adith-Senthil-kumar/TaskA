@@ -1,8 +1,8 @@
-# Lastmile — Digital Heroes submission
+# Lastmile — Digital Heroes Task A
 
 Adith Senthil Kumar · Role 06, Mobile App Developer
 
-**Live demo → https://adith-senthil-kumar.github.io/lastmile/**
+**Live demo → https://adith-senthil-kumar.github.io/TaskA/**
 
 It is talking to a real mock API, not fixtures. The server is slow, fails a
 percentage of requests on purpose, and will disagree with the client about what
@@ -14,9 +14,16 @@ are the real ones.
 | Folder | Contents |
 | --- | --- |
 | `task-a-app/` | The Lastmile app. React Native + Expo, offline-first, 50 tests. Start with its own `README.md` — that's the deliverable that argues the decisions. |
-| `task-b/` | Four documents: review framework, code review of GymOS, release process, performance budget. |
 | `design-prototypes/` | The HTML design prototypes. Open `Lastmile v2.dc.html` in a browser — it's the visual reference the app was built from. |
 | `screenshots/` | The sync states, captured from the production build: queued offline, retry after a 503, the queue draining, and a conflict escalating to the driver. |
+
+## Task B
+
+Task B is a separate submission and lives in its own repository:
+
+**https://github.com/Adith-Senthil-kumar/Taskb**
+
+Nothing in this repository relates to it.
 
 ## Fastest path to running it
 

@@ -7,7 +7,7 @@ build time, so the API has to exist first.
 
 | | |
 | --- | --- |
-| Web app | **https://adith-senthil-kumar.github.io/lastmile/** |
+| Web app | **https://adith-senthil-kumar.github.io/TaskA/** |
 | Mock API | **https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi** |
 
 ### The mock API, as a Cloud Function
@@ -62,12 +62,12 @@ Two details that Pages requires and that are easy to lose:
   Jekyll and silently drops `_expo/` — every asset 404s because the directory
   name starts with an underscore.
 - **`404.html` is a copy of `index.html`.** Pages has no SPA rewrite, so a deep
-  link like `/lastmile/outbox` is served as the 404 document. The status code
+  link like `/TaskA/outbox` is served as the 404 document. The status code
   is still 404, but the shell boots and the router resolves the path, so it
   works. Anything expecting a 200 on a deep link will disagree.
 
 Because Pages serves from a subpath, `expo.experiments.baseUrl` is set to
-`/lastmile` in `app.json`. **Remove it if you ever deploy to a root domain**, or
+`/TaskA` in `app.json`. **Remove it if you ever deploy to a root domain**, or
 every asset path will be wrong in the other direction.
 
 Redeploy with:
@@ -77,7 +77,7 @@ cd task-a-app
 EXPO_PUBLIC_API_URL=<api-url> npx expo export --platform web --clear
 cd dist && touch .nojekyll && cp index.html 404.html
 git init -q && git add -A && git commit -qm "Deploy web build"
-git push -f https://github.com/Adith-Senthil-kumar/lastmile.git HEAD:gh-pages
+git push -f https://github.com/Adith-Senthil-kumar/TaskA.git HEAD:gh-pages
 ```
 
 The build is wired to the Cloud Function above via `EXPO_PUBLIC_API_URL`, so the

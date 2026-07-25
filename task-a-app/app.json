@@ -27,7 +27,7 @@
     },
     "scheme": "lastmile",
     "experiments": {
-      "baseUrl": "/lastmile"
+      "baseUrl": "/TaskA"
     },
     "plugins": [
       [
