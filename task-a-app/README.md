@@ -28,15 +28,25 @@ The mock API is deliberately hostile. By default it adds 150–300ms of latency 
 LATENCY_MS=800 FAILURE_RATE=0.5 npm run mock-api   # a genuinely bad day
 ```
 
-Two admin endpoints exist to force situations that are otherwise hard to reproduce by hand:
+Three admin endpoints exist to force situations that are otherwise hard to reproduce by hand:
 
 ```bash
 # Simulate a total outage — the server drops connections
-curl -X POST localhost:4000/admin/offline -d '{"offline":true}' -H 'Content-Type: application/json'
+curl -X POST localhost:4000/admin/offline \
+  -d '{"offline":true}' -H 'Content-Type: application/json'
 
 # Simulate dispatch changing an order underneath the driver (forces a conflict)
-curl -X POST localhost:4000/admin/orders/ord-005/status -d '{"status":"failed"}' -H 'Content-Type: application/json'
+curl -X POST localhost:4000/admin/orders/ord-005/status \
+  -d '{"status":"failed"}' -H 'Content-Type: application/json'
+
+# Back to the seeded shift, so the walkthrough can be run again
+curl -X POST localhost:4000/admin/reset
 ```
+
+The app can do the last one itself — Profile has a "Reset demo data" button, kept
+under a heading that says it is not part of the product. It reseeds the server
+and clears the device together, because resetting one and not the other leaves
+the two disagreeing and the reset looking broken.
 
 ```bash
 npm test          # 50 tests
