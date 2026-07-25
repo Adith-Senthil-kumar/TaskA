@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { selectCounts, selectVisibleOrders, useAppStore } from '../../src/store/useAppStore';
 import {
   EmptyState,
+  ErrorState,
   FilterChip,
   FooterCredit,
   Loading,
@@ -31,7 +32,7 @@ const FILTERS: { key: OrderStatus | 'all'; label: string }[] = [
 
 export default function RouteScreen() {
   const palette = usePalette();
-  const { ready, loading, filter, setFilter, query, setQuery, syncNow, sync, queue, orders: all } =
+  const { ready, loading, error, bootstrap, filter, setFilter, query, setQuery, syncNow, sync, queue, orders: all } =
     useAppStore();
   const orders = useAppStore(useShallow(selectVisibleOrders));
   const counts = useAppStore(useShallow(selectCounts));
@@ -40,6 +41,16 @@ export default function RouteScreen() {
     () => all.filter((o) => o.status === 'delivered' || o.status === 'failed').length,
     [all],
   );
+
+  if (error && !ready) {
+    return (
+      <ErrorState
+        title="Could not open this phone's database"
+        message={`${error}\n\nYour saved work is still on the device. Nothing has been lost.`}
+        onRetry={() => void bootstrap()}
+      />
+    );
+  }
 
   if (!ready && loading) return <Loading label="Reaching dispatch…" />;
 

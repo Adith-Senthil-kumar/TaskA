@@ -289,6 +289,46 @@ export function EmptyState({
   );
 }
 
+/**
+ * A failure the driver cannot work around, with the only useful action next to
+ * it. Distinct from EmptyState because "there is nothing here" and "this is
+ * broken" are different messages, and only one of them is red.
+ */
+export function ErrorState({
+  title,
+  message,
+  onRetry,
+}: {
+  title: string;
+  message: string;
+  onRetry?: () => void;
+}) {
+  const palette = usePalette();
+  return (
+    <View style={[errorStyles.wrap, { backgroundColor: palette.bg }]}>
+      <View style={[errorStyles.icon, { backgroundColor: palette.redsoft }]}>
+        <Ionicons name="alert-circle-outline" size={26} color={palette.red} />
+      </View>
+      <Text style={[errorStyles.title, { color: palette.ink }]}>{title}</Text>
+      <Text style={[errorStyles.body, { color: palette.ink2 }]}>{message}</Text>
+      {onRetry ? (
+        <View style={errorStyles.action}>
+          <Button label="Try again" variant="primary" onPress={onRetry} />
+        </View>
+      ) : null}
+      <FooterCredit />
+    </View>
+  );
+}
+
+const errorStyles = StyleSheet.create({
+  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
+  icon: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  title: { fontSize: 19, fontWeight: '700', textAlign: 'center' },
+  body: { fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  action: { alignSelf: 'stretch', marginTop: 22 },
+});
+
 export function Loading({ label }: { label: string }) {
   const palette = usePalette();
   return (

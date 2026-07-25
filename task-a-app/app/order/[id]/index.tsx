@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   EmptyState,
+  ErrorState,
   FooterCredit,
   Loading,
   Pill,
@@ -26,12 +27,24 @@ export default function OrderDetailScreen() {
   const sync = useAppStore((s) => s.sync);
   const resolveReview = useAppStore((s) => s.resolveReview);
   const ready = useAppStore((s) => s.ready);
+  const error = useAppStore((s) => s.error);
+  const bootstrap = useAppStore((s) => s.bootstrap);
   const [history, setHistory] = useState<StatusChange[] | null>(null);
 
   useEffect(() => {
     if (!ready || !id) return;
     void getRuntime().store.getStatusHistory(id).then(setHistory);
   }, [ready, id, order?.updatedAt]);
+
+  if (error && !ready) {
+    return (
+      <ErrorState
+        title="Could not open this phone's database"
+        message={`${error}\n\nYour saved work is still on the device. Nothing has been lost.`}
+        onRetry={() => void bootstrap()}
+      />
+    );
+  }
 
   if (!ready) return <Loading label="Opening the stop" />;
   if (!order) {

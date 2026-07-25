@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
 import { selectReviewOrders, useAppStore } from '../../src/store/useAppStore';
-import { Button, Card, FooterCredit, Loading, Pill } from '../../src/ui/components';
+import { Button, Card, ErrorState, FooterCredit, Loading, Pill } from '../../src/ui/components';
 import { usePalette } from '../../src/ui/theme';
 import { STATUS_LABELS } from '../../src/core/statusMachine';
 
@@ -17,9 +17,19 @@ import { STATUS_LABELS } from '../../src/core/statusMachine';
  */
 export default function OutboxScreen() {
   const palette = usePalette();
-  const { ready, sync, queue, syncNow } = useAppStore();
+  const { ready, error, bootstrap, sync, queue, syncNow } = useAppStore();
   const reviews = useAppStore(useShallow(selectReviewOrders));
   const orders = useAppStore((s) => s.orders);
+
+  if (error && !ready) {
+    return (
+      <ErrorState
+        title="Could not open this phone's database"
+        message={`${error}\n\nYour saved work is still on the device. Nothing has been lost.`}
+        onRetry={() => void bootstrap()}
+      />
+    );
+  }
 
   if (!ready) return <Loading label="Reading the queue" />;
 

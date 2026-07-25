@@ -61,7 +61,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   bootstrap: async () => {
     if (get().ready) return;
-    set({ loading: true });
+    // Cleared up front so a retry that succeeds does not leave the last
+    // failure on screen.
+    set({ loading: true, error: null });
     try {
       const { engine } = await initRuntime();
       engine.subscribe((sync) => {
