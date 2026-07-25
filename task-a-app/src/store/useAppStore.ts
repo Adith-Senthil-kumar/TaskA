@@ -28,12 +28,15 @@ interface AppState {
   /** The outbox, mirrored for the UI so rows can show their own sync state. */
   queue: OutboxEntry[];
   filter: Filter;
+  /** Free-text search over customer, reference and address. */
+  query: string;
   sync: SyncStatus | null;
 
   bootstrap: () => Promise<void>;
   refresh: () => Promise<void>;
   syncNow: () => Promise<void>;
   setFilter: (filter: Filter) => void;
+  setQuery: (query: string) => void;
   updateStatus: (input: StatusChangeInput) => Promise<void>;
   resolveReview: (orderId: string, chosen: OrderStatus) => Promise<void>;
 }
@@ -45,6 +48,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   orders: [],
   queue: [],
   filter: 'all',
+  query: '',
   sync: null,
 
   bootstrap: async () => {
@@ -87,6 +91,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setFilter: (filter) => set({ filter }),
 
+  setQuery: (query) => set({ query }),
+
   updateStatus: async (input) => {
     const { engine } = getRuntime();
     try {
@@ -112,8 +118,18 @@ export const useAppStore = create<AppState>((set, get) => ({
  * sees the snapshot change on every render and loops until it bails out.
  */
 export function selectVisibleOrders(state: AppState): Order[] {
-  if (state.filter === 'all') return state.orders;
-  return state.orders.filter((order) => order.status === state.filter);
+  const query = state.query.trim().toLowerCase();
+  return state.orders.filter((order) => {
+    if (state.filter !== 'all' && order.status !== state.filter) return false;
+    if (!query) return true;
+    // Searched against what a driver actually has to hand: a name shouted
+    // through a door, a reference read off a label, or a street sign.
+    return (
+      order.customerName.toLowerCase().includes(query) ||
+      order.reference.toLowerCase().includes(query) ||
+      order.address.toLowerCase().includes(query)
+    );
+  });
 }
 
 export function selectReviewOrders(state: AppState): Order[] {

@@ -66,6 +66,8 @@ export interface Order {
    * copy is stale before a push is attempted.
    */
   version: number;
+  /** When dispatch raised the order. Server-assigned and never changes. */
+  createdAt: number;
   updatedAt: number;
   /** True when local state has diverged and a human must choose. */
   needsReview: boolean;

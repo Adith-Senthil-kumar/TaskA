@@ -148,6 +148,12 @@ export default function StatusUpdateScreen() {
           onPress={save}
           disabled={!canSave || saving}
         />
+        {connection === 'offline' ? (
+          <View style={styles.waiting}>
+            <Ionicons name="cloud-offline-outline" size={16} color={palette.or} />
+            <Text style={[styles.waitingLabel, { color: palette.or }]}>Waiting for sync</Text>
+          </View>
+        ) : null}
         <Text style={[styles.reassurance, { color: palette.ink2 }]}>
           {connection === 'offline'
             ? 'No signal here. This saves on the phone and sends itself when you get signal.'
@@ -234,5 +240,7 @@ const styles = StyleSheet.create({
   photoLabel: { fontSize: 15, fontWeight: '500' },
   photoMeta: { fontSize: 12, marginTop: 2 },
   footer: { marginTop: 28, gap: 12 },
+  waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  waitingLabel: { fontSize: 14, fontWeight: '600' },
   reassurance: { fontSize: 13, textAlign: 'center', lineHeight: 18 },
 });

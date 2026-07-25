@@ -59,6 +59,8 @@ function seedOrders(now) {
       items,
       status,
       version: 1,
+      // Raised before the shift started; touched during it.
+      createdAt: clock - (18 - i) * 15 * 60_000,
       updatedAt: clock + i * 60_000,
       needsReview: false,
     });

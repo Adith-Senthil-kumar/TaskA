@@ -51,10 +51,13 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="order/[id]/index" options={{ title: '', headerBackTitle: 'Route' }} />
+        <Stack.Screen
+          name="order/[id]/index"
+          options={{ title: 'Order details', headerBackTitle: 'Orders' }}
+        />
         <Stack.Screen
           name="order/[id]/status"
-          options={{ title: 'Update status', presentation: 'modal' }}
+          options={{ title: 'Update order status', presentation: 'modal' }}
         />
       </Stack>
     </ThemeProvider>

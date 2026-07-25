@@ -207,6 +207,7 @@ export function makeOrder(overrides: Partial<Order> = {}): Order {
     items: [{ sku: 'SKU-1', name: 'Box', quantity: 1 }],
     status: 'in_transit',
     version: 3,
+    createdAt: 1_699_995_400_000,
     updatedAt: 1_699_999_000_000,
     needsReview: false,
     ...overrides,

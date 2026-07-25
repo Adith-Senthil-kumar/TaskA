@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /**
  * One migration array, applied in order, with the applied version recorded in
@@ -59,5 +59,15 @@ export const MIGRATIONS: readonly string[] = [
     key    TEXT PRIMARY KEY NOT NULL,
     value  TEXT NOT NULL
   );
+  `,
+
+  // 2: when dispatch raised the order, shown on the detail screen. Backfilled
+  // to updated_at rather than 0, because a phone that has been offline since
+  // before this migration still holds real orders, and showing them as created
+  // at the epoch would be worse than showing them as created when we last heard
+  // about them.
+  `
+  ALTER TABLE orders ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0;
+  UPDATE orders SET created_at = updated_at WHERE created_at = 0;
   `,
 ];

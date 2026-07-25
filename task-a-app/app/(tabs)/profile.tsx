@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Constants from 'expo-constants';
 import { useAppStore } from '../../src/store/useAppStore';
 import { Button, Card } from '../../src/ui/components';
 import { usePalette } from '../../src/ui/theme';
@@ -14,6 +16,21 @@ export default function ProfileScreen() {
   const palette = usePalette();
   const pending = useAppStore((s) => s.sync?.pendingCount ?? 0);
   const syncNow = useAppStore((s) => s.syncNow);
+  const sync = useAppStore((s) => s.sync);
+  const [syncing, setSyncing] = useState(false);
+
+  const offline = sync?.connection === 'offline';
+  const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+
+  const forceSync = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      await syncNow();
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const signOut = () => {
     if (pending > 0) {
@@ -51,15 +68,37 @@ export default function ProfileScreen() {
         <Field label="Vehicle" value="Van 14 · LM 41 208" />
         <Field label="Depot" value="Northgate" />
         <Field label="Dispatch server" value={API_BASE_URL} />
+        <Field label="App version" value={appVersion} />
       </Card>
 
       <Card>
-        <Text style={[styles.sectionTitle, { color: palette.ink }]}>On this phone</Text>
-        <Text style={[styles.sectionSub, { color: palette.ink2 }]}>
-          {pending === 0
-            ? 'Nothing is waiting. Every change has reached the server.'
-            : `${pending} ${pending === 1 ? 'change is' : 'changes are'} saved here and not yet sent.`}
-        </Text>
+        <View style={styles.pendingRow}>
+          <View style={styles.flex}>
+            <Text style={[styles.sectionTitle, { color: palette.ink }]}>Pending sync</Text>
+            <Text style={[styles.sectionSub, { color: palette.ink2 }]}>
+              {pending === 0
+                ? 'Nothing is waiting. Every change has reached the server.'
+                : `${pending} ${pending === 1 ? 'change is' : 'changes are'} saved here and not yet sent.`}
+            </Text>
+          </View>
+          <Text
+            style={[
+              styles.pendingCount,
+              { color: pending > 0 ? palette.or : palette.ink3 },
+            ]}
+          >
+            {pending}
+          </Text>
+        </View>
+
+        <View style={{ marginTop: 14 }}>
+          <Button
+            label={syncing ? 'Syncing…' : offline ? 'Force Sync — waiting for signal' : 'Force Sync'}
+            variant="primary"
+            onPress={forceSync}
+            disabled={syncing || offline}
+          />
+        </View>
       </Card>
 
       <View style={styles.footer}>
@@ -100,6 +139,8 @@ const styles = StyleSheet.create({
   fieldLabel: { fontSize: 12.5 },
   fieldValue: { fontSize: 15.5, marginTop: 2 },
   sectionTitle: { fontSize: 16, fontWeight: '600' },
+  pendingRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  pendingCount: { fontSize: 30, fontWeight: '700', fontVariant: ['tabular-nums'], lineHeight: 34 },
   sectionSub: { fontSize: 13, marginTop: 4, lineHeight: 19 },
   footer: { paddingHorizontal: 16, paddingTop: 24 },
   credit: { paddingTop: 28, paddingBottom: 8, alignItems: 'center' },

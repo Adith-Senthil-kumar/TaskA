@@ -22,6 +22,7 @@ interface OrderRow {
   items_json: string;
   status: string;
   version: number;
+  created_at: number;
   updated_at: number;
   needs_review: number;
   review_json: string | null;
@@ -72,6 +73,7 @@ function toOrder(row: OrderRow): Order {
     items: JSON.parse(row.items_json) as OrderItem[],
     status: row.status as OrderStatus,
     version: row.version,
+    createdAt: row.created_at,
     updatedAt: row.updated_at,
     needsReview: row.needs_review === 1,
     reviewSnapshot: row.review_json ? (JSON.parse(row.review_json) as ReviewSnapshot) : undefined,
@@ -94,8 +96,8 @@ function toOutboxEntry(row: OutboxRow): OutboxEntry {
 const UPSERT_ORDER = `
   INSERT INTO orders (
     id, reference, customer_name, customer_phone, address, delivery_window,
-    notes, items_json, status, version, updated_at, needs_review, review_json
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    notes, items_json, status, version, created_at, updated_at, needs_review, review_json
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(id) DO UPDATE SET
     reference = excluded.reference,
     customer_name = excluded.customer_name,
@@ -106,6 +108,7 @@ const UPSERT_ORDER = `
     items_json = excluded.items_json,
     status = excluded.status,
     version = excluded.version,
+    created_at = excluded.created_at,
     updated_at = excluded.updated_at,
     needs_review = excluded.needs_review,
     review_json = excluded.review_json
@@ -123,6 +126,7 @@ function orderParams(order: Order) {
     JSON.stringify(order.items),
     order.status,
     order.version,
+    order.createdAt,
     order.updatedAt,
     order.needsReview ? 1 : 0,
     order.reviewSnapshot ? JSON.stringify(order.reviewSnapshot) : null,

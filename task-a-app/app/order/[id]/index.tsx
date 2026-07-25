@@ -34,6 +34,14 @@ export default function OrderDetailScreen() {
     );
   }
 
+  const waiting = queue.filter((entry) => entry.orderId === order.id).length;
+  const lastSyncedChange = (history ?? []).find((change) => change.synced);
+  const lastSync = waiting > 0
+    ? `Waiting for sync · ${waiting} ${waiting === 1 ? 'change' : 'changes'} held`
+    : lastSyncedChange
+      ? formatStamp(lastSyncedChange.recordedAt)
+      : formatStamp(order.updatedAt);
+
   const kind = syncKindFor(order, queue, sync);
   const pill = detailPill(kind);
   const items = order.items.reduce((total, item) => total + item.quantity, 0);
@@ -104,8 +112,14 @@ export default function OrderDetailScreen() {
       </Card>
 
       <Card>
+        <Row label="Order status" value={STATUS_LABELS[order.status]} />
+        <Row label="Created" value={formatStamp(order.createdAt)} />
+        <Row label="Last sync time" value={lastSync} />
+      </Card>
+
+      <Card>
         <Text style={[styles.sectionTitle, { color: palette.ink }]}>
-          Items · {items} {items === 1 ? 'item' : 'items'}
+          Products · {items} {items === 1 ? 'item' : 'items'}
         </Text>
         {order.items.map((item) => (
           <View key={item.sku} style={styles.itemRow}>
@@ -164,6 +178,14 @@ export default function OrderDetailScreen() {
       </View>
     </ScrollView>
   );
+}
+
+function formatStamp(ms: number): string {
+  const d = new Date(ms);
+  const today = new Date();
+  const sameDay = d.toDateString() === today.toDateString();
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return sameDay ? `Today ${time}` : `${d.toLocaleDateString()} ${time}`;
 }
 
 const styles = StyleSheet.create({

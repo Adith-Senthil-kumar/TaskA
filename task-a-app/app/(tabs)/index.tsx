@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
@@ -30,7 +30,8 @@ const FILTERS: { key: OrderStatus | 'all'; label: string }[] = [
 
 export default function RouteScreen() {
   const palette = usePalette();
-  const { ready, loading, filter, setFilter, syncNow, sync, queue, orders: all } = useAppStore();
+  const { ready, loading, filter, setFilter, query, setQuery, syncNow, sync, queue, orders: all } =
+    useAppStore();
   const orders = useAppStore(useShallow(selectVisibleOrders));
   const counts = useAppStore(useShallow(selectCounts));
 
@@ -71,6 +72,27 @@ export default function RouteScreen() {
               onAction={card.action ? syncNow : undefined}
             />
 
+            <View style={[styles.searchWrap, { backgroundColor: palette.card }]}>
+              <Ionicons name="search" size={16} color={palette.ink3} />
+              <TextInput
+                style={[styles.search, { color: palette.ink }]}
+                placeholder="Search name, reference or street"
+                placeholderTextColor={palette.ink3}
+                value={query}
+                onChangeText={setQuery}
+                autoCorrect={false}
+                autoCapitalize="none"
+                returnKeyType="search"
+                clearButtonMode="while-editing"
+                accessibilityLabel="Search orders"
+              />
+              {query.length > 0 ? (
+                <Pressable onPress={() => setQuery('')} accessibilityLabel="Clear search" hitSlop={10}>
+                  <Ionicons name="close-circle" size={17} color={palette.ink3} />
+                </Pressable>
+              ) : null}
+            </View>
+
             <View style={styles.filters}>
               {FILTERS.map((f) => (
                 <FilterChip
@@ -91,6 +113,13 @@ export default function RouteScreen() {
               body="Nothing has been assigned to you. Pull down to check again."
               actionLabel="Check again"
               onAction={syncNow}
+            />
+          ) : query.trim() ? (
+            <EmptyState
+              title="No match"
+              body={`Nothing in today's ${all.length} stops matches “${query.trim()}”.`}
+              actionLabel="Clear search"
+              onAction={() => setQuery('')}
             />
           ) : (
             // Deliberately distinct from having no work at all. Telling a driver
@@ -231,7 +260,18 @@ const styles = StyleSheet.create({
   headline: { flexDirection: 'row', alignItems: 'baseline', gap: 8, paddingHorizontal: 16, paddingTop: 12 },
   progress: { fontSize: 34, fontWeight: '700', letterSpacing: -1, fontVariant: ['tabular-nums'] },
   progressLabel: { fontSize: 15 },
-  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 10,
+  },
+  search: { flex: 1, fontSize: 15.5, paddingVertical: 0 },
+  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12 },
   rowBody: { flex: 1, minWidth: 0 },
   rowTop: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
