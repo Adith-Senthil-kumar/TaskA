@@ -35,7 +35,7 @@ export async function initRuntime(): Promise<Runtime> {
     store,
     api: new HttpOrderApi({ baseUrl: API_BASE_URL }),
     clock: { now: () => Date.now() },
-    connectivity: new NetInfoConnectivity(),
+    connectivity: new NetInfoConnectivity({ reachabilityUrl: `${API_BASE_URL}/health` }),
     ids: uuidIds,
   });
   engine.start();

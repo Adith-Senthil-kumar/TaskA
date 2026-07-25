@@ -3,6 +3,39 @@
 Two things have to go up, in this order. The web build bakes the API URL in at
 build time, so the API has to exist first.
 
+## Currently deployed
+
+The web build is live on GitHub Pages:
+**https://adith-senthil-kumar.github.io/lastmile/**
+
+It is served from the `gh-pages` branch, which holds the built output only.
+Two details that Pages requires and that are easy to lose:
+
+- **`.nojekyll`** must exist at the root, or Pages runs the output through
+  Jekyll and silently drops `_expo/` — every asset 404s because the directory
+  name starts with an underscore.
+- **`404.html` is a copy of `index.html`.** Pages has no SPA rewrite, so a deep
+  link like `/lastmile/outbox` is served as the 404 document. The status code
+  is still 404, but the shell boots and the router resolves the path, so it
+  works. Anything expecting a 200 on a deep link will disagree.
+
+Because Pages serves from a subpath, `expo.experiments.baseUrl` is set to
+`/lastmile` in `app.json`. **Remove it if you ever deploy to a root domain**, or
+every asset path will be wrong in the other direction.
+
+Redeploy with:
+
+```bash
+cd task-a-app
+EXPO_PUBLIC_API_URL=<api-url> npx expo export --platform web --clear
+cd dist && touch .nojekyll && cp index.html 404.html
+git init -q && git add -A && git commit -qm "Deploy web build"
+git push -f https://github.com/Adith-Senthil-kumar/lastmile.git HEAD:gh-pages
+```
+
+The mock API is **not** deployed yet. Until it is, the live URL loads and the
+UI works, but the route list is empty — there is nothing to pull from.
+
 ## 1. The mock API
 
 `render.yaml` in this directory is a Render blueprint. Point Render at the repo,

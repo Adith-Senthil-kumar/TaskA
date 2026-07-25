@@ -24,6 +24,9 @@
       "favicon": "./assets/favicon.png"
     },
     "scheme": "lastmile",
+    "experiments": {
+      "baseUrl": "/lastmile"
+    },
     "plugins": [
       [
         "expo-router",
