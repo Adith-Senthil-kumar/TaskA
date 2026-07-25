@@ -5,8 +5,55 @@ build time, so the API has to exist first.
 
 ## Currently deployed
 
-The web build is live on GitHub Pages:
-**https://adith-senthil-kumar.github.io/lastmile/**
+| | |
+| --- | --- |
+| Web app | **https://adith-senthil-kumar.github.io/lastmile/** |
+| Mock API | **https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi** |
+
+### The mock API, as a Cloud Function
+
+`functions/index.js` runs the same rules as the local server — both import
+`mock-api/domain.js`, which is where the conflict, ranking and idempotency
+decisions actually live. Only the storage differs.
+
+That difference is the whole reason the function exists in this shape. A Cloud
+Function is stateless and can cold-start between any two requests, and this
+API's entire job is to hold a version number long enough for a client to
+collide with it. So the state is one JSON document in Firestore, mutated inside
+a transaction, because the conflict demo *is* a race between two writers.
+
+`firebase.json` copies `domain.js` into `functions/` as a predeploy step, so the
+deployed rules cannot drift from the tested ones. `functions/domain.js` is
+generated and gitignored — do not edit it.
+
+Deploy it with:
+
+```bash
+cd task-a-app
+firebase deploy --only functions:lastmile:lastmileMockApi
+```
+
+**Always deploy with that exact `--only` scope.** The target project also runs
+an unrelated live application with four functions of its own, plus Firestore
+rules and a Hosting site. A bare `firebase deploy` would consider all of those
+in scope. `firebase.json` deliberately declares *only* a functions block and
+puts this function in its own `lastmile` codebase, so both the config and the
+command have to be wrong before anything else can be touched.
+
+Useful while demoing:
+
+```bash
+API=https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi
+
+curl -X POST $API/admin/reset                             # back to the 18 seeded stops
+curl -X POST $API/admin/offline -d '{"offline":true}' -H 'Content-Type: application/json'
+curl -X POST $API/admin/orders/ord-005/status -d '{"status":"failed"}' -H 'Content-Type: application/json'
+```
+
+`render.yaml` is still in the repo as an alternative host for the same server if
+you ever want it off Firebase.
+
+### The web app, on GitHub Pages
 
 It is served from the `gh-pages` branch, which holds the built output only.
 Two details that Pages requires and that are easy to lose:
@@ -33,8 +80,8 @@ git init -q && git add -A && git commit -qm "Deploy web build"
 git push -f https://github.com/Adith-Senthil-kumar/lastmile.git HEAD:gh-pages
 ```
 
-The mock API is **not** deployed yet. Until it is, the live URL loads and the
-UI works, but the route list is empty — there is nothing to pull from.
+The build is wired to the Cloud Function above via `EXPO_PUBLIC_API_URL`, so the
+live site pulls a real route and pushes real status changes.
 
 ## 1. The mock API
 

@@ -5,3 +5,8 @@ web-build/
 *.log
 .DS_Store
 *.orig.*
+
+# Generated at deploy time from mock-api/domain.js — see firebase.json predeploy
+functions/domain.js
+functions/node_modules/
+.firebase/

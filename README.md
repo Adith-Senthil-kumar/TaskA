@@ -2,6 +2,13 @@
 
 Adith Senthil Kumar · Role 06, Mobile App Developer
 
+**Live demo → https://adith-senthil-kumar.github.io/lastmile/**
+
+It is talking to a real mock API, not fixtures. The server is slow, fails a
+percentage of requests on purpose, and will disagree with the client about what
+happened to an order — so the retry, backoff and conflict paths on the live site
+are the real ones.
+
 ## What's in here
 
 | Folder | Contents |
