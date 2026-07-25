@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Lastmile",
-    "slug": "lastmile",
+    "slug": "TaskA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -42,7 +42,7 @@
         "root": "./app"
       },
       "eas": {
-        "projectId": "f18bab1c-b865-488a-969b-9527349131f1"
+        "projectId": "66a03ca0-8205-42f8-bdfe-2b8a2ea2a21e"
       }
     },
     "owner": "adith7301",
@@ -50,7 +50,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/f18bab1c-b865-488a-969b-9527349131f1"
+      "url": "https://u.expo.dev/66a03ca0-8205-42f8-bdfe-2b8a2ea2a21e"
     }
   }
 }

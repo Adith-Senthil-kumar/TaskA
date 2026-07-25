@@ -57,3 +57,29 @@ curl -X POST localhost:4000/admin/orders/ord-005/status -d '{"status":"failed"}'
 - Not yet run on a physical device or simulator — see "What the tests could not
   catch" in `task-a-app/README.md`, which is honest about what that cost
 - Deploying: `task-a-app/DEPLOY.md`
+
+## Where I used AI
+
+I used Claude Code throughout, and the split is worth stating plainly rather
+than blurring. The architecture is mine and it is what I would defend in a
+review: choosing a delivery-driver context so offline-first was a requirement
+rather than a feature, keeping `src/core` free of React Native imports so the
+sync logic is testable without a simulator, committing the order, history and
+outbox writes as a single transaction, ranking statuses instead of trusting
+device clocks, and escalating `delivered` versus `failed` to a human rather
+than guessing. Claude wrote most of the code against those decisions, and did
+the part that reading alone cannot: the first real run surfaced five defects I
+would not have found on paper — an unbound `fetch` that only breaks in a
+browser, a Zustand selector that re-rendered until React gave up, a
+`Link asChild` style merge that silently discarded every row style, a router
+root that excluded the entire UI from the bundle, and a status card reporting
+"All caught up" while the network was down. It also handled the deployment, the
+mock API as a Cloud Function, and the Android build. What I changed afterwards
+came from auditing the result against the brief myself: search, created date,
+last sync time, app version, a Force Sync button and dark mode were all
+missing and got added, the screen and field names were corrected to match the
+brief exactly, and the footer credit moved from one screen to all five. The
+honest summary is that Claude out-typed me and I out-decided it, and both
+halves were necessary — the bugs it caught were ones I could not have seen
+without running the app, and the gaps I caught were ones it had no way to know
+mattered.
