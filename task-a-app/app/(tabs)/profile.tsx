@@ -19,6 +19,32 @@ export default function ProfileScreen() {
   const sync = useAppStore((s) => s.sync);
   const theme = useAppStore((s) => s.theme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const resetDemo = useAppStore((s) => s.resetDemo);
+  const [resetting, setResetting] = useState(false);
+
+  const confirmReset = () => {
+    Alert.alert(
+      'Reset the demo?',
+      'This puts the server and this phone back to the eighteen seeded stops. Anything queued here is discarded.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            setResetting(true);
+            try {
+              await resetDemo();
+            } catch (e) {
+              Alert.alert('Could not reset', e instanceof Error ? e.message : String(e));
+            } finally {
+              setResetting(false);
+            }
+          },
+        },
+      ],
+    );
+  };
   const [syncing, setSyncing] = useState(false);
 
   const offline = sync?.connection === 'offline';
@@ -135,6 +161,23 @@ export default function ProfileScreen() {
               </Pressable>
             );
           })}
+        </View>
+      </Card>
+
+      <Card>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>Demo controls</Text>
+        <Text style={[styles.sectionSub, { color: palette.ink2 }]}>
+          Not part of the product. This exists so the offline and conflict
+          walkthrough can be run more than once without a terminal — it reseeds
+          the mock server and clears this phone together, because resetting only
+          one of them leaves the two disagreeing.
+        </Text>
+        <View style={{ marginTop: 14 }}>
+          <Button
+            label={resetting ? 'Resetting…' : offline ? 'Reset demo data — needs signal' : 'Reset demo data'}
+            onPress={confirmReset}
+            disabled={resetting || offline}
+          />
         </View>
       </Card>
 

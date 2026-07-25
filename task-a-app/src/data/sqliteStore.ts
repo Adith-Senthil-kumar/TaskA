@@ -303,6 +303,21 @@ export class SqliteStore implements LocalStore {
     );
   }
 
+  /**
+   * Drops everything belonging to today's shift so the next pull starts from a
+   * clean slate. The watermark goes with it — leaving it behind would make the
+   * server's re-seeded orders look older than what we last saw, and the pull
+   * would return nothing. Preferences are keyed separately and survive.
+   */
+  async clearShiftData(): Promise<void> {
+    await this.db.withTransactionAsync(async () => {
+      await this.db.execAsync('DELETE FROM outbox');
+      await this.db.execAsync('DELETE FROM status_changes');
+      await this.db.execAsync('DELETE FROM orders');
+      await this.db.runAsync('DELETE FROM meta WHERE key = ?', 'watermark');
+    });
+  }
+
   async getWatermark(): Promise<number | null> {
     const row = await this.db.getFirstAsync<{ value: string }>(
       "SELECT value FROM meta WHERE key = 'watermark'",

@@ -48,3 +48,27 @@ export function getRuntime(): Runtime {
   if (!runtime) throw new Error('Runtime accessed before initRuntime() resolved');
   return runtime;
 }
+
+/**
+ * Puts the mock server and this device back to the seeded shift.
+ *
+ * A demo affordance, not a product feature, and deliberately kept here rather
+ * than on the OrderApi port: the sync engine has no notion of "start over", and
+ * adding one to satisfy a walkthrough would be the wrong shape.
+ *
+ * Both halves are required. Resetting only the server leaves this phone holding
+ * the mutated orders and a watermark newer than the re-seeded data, so the next
+ * pull returns nothing and the reset looks broken.
+ */
+export async function resetDemoData(): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/admin/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  if (!response.ok) throw new Error(`The server refused to reset (${response.status})`);
+
+  const { store, engine } = getRuntime();
+  await store.clearShiftData();
+  await engine.sync();
+}

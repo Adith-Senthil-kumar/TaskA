@@ -16,6 +16,7 @@
  * reproduce by hand:
  *   POST /admin/orders/:id/status  { "status": "failed" }   simulate dispatch
  *   POST /admin/offline           { "offline": true }       simulate an outage
+ *   POST /admin/reset                                       back to the seed
  */
 const http = require('node:http');
 const { STATUSES, seedOrders, decideStatusPush } = require('./domain');
@@ -60,6 +61,15 @@ const server = http.createServer(async (req, res) => {
 
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const path = url.pathname;
+
+  if (path === '/admin/reset' && req.method === 'POST') {
+    orders.clear();
+    idempotency.clear();
+    forcedOffline = false;
+    for (const order of seedOrders(Date.now())) orders.set(order.id, order);
+    console.log('[admin] reset to the seeded shift');
+    return json(res, 200, { reset: true, orders: orders.size });
+  }
 
   if (path === '/admin/offline' && req.method === 'POST') {
     const body = await readBody(req);
@@ -143,5 +153,6 @@ server.listen(PORT, () => {
   console.log(`Lastmile mock API on http://localhost:${PORT}`);
   console.log(`  latency ${LATENCY_MS}-${LATENCY_MS * 2}ms, failure rate ${FAILURE_RATE}`);
   console.log(`  POST /admin/offline            {"offline":true}  simulate an outage`);
+  console.log(`  POST /admin/reset                                back to the seeded shift`);
   console.log(`  POST /admin/orders/:id/status  {"status":"failed"}  simulate dispatch`);
 });

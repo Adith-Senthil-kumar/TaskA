@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Order, OrderStatus, OutboxEntry, SyncStatus } from '../core/types';
 import type { StatusChangeInput } from '../core/syncEngine';
-import { getRuntime, initRuntime } from '../app/runtime';
+import { getRuntime, initRuntime, resetDemoData } from '../app/runtime';
 
 /**
  * Zustand holds a projection of the database, not a second source of truth.
@@ -46,6 +46,7 @@ interface AppState {
   setTheme: (theme: ThemePreference) => void;
   updateStatus: (input: StatusChangeInput) => Promise<void>;
   resolveReview: (orderId: string, chosen: OrderStatus) => Promise<void>;
+  resetDemo: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -120,6 +121,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ error: describe(error) });
       throw error;
     }
+  },
+
+  resetDemo: async () => {
+    await resetDemoData();
+    set({ filter: 'all', query: '' });
+    await get().refresh();
   },
 
   resolveReview: async (orderId, chosen) => {
