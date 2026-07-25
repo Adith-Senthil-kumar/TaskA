@@ -1,0 +1,23 @@
+# Hosts the mock order API so the deployed web build has something to talk to.
+#
+# The app defaults to http://localhost:4000, which resolves to nothing on a
+# live URL — a reviewer opening the deployed site would see an empty route and
+# conclude the app was broken. This puts the same mock server on a public
+# origin, and the web build is then given its URL via EXPO_PUBLIC_API_URL.
+#
+# No build step: the server is Node standard library only, by design.
+services:
+  - type: web
+    name: lastmile-mock-api
+    runtime: node
+    plan: free
+    buildCommand: "echo 'no build step required'"
+    startCommand: node mock-api/server.js
+    envVars:
+      - key: LATENCY_MS
+        value: "150"
+      # Lower than the local default of 0.15. The retry path is worth
+      # demonstrating, but a reviewer clicking through for two minutes should
+      # not spend most of it watching backoff.
+      - key: FAILURE_RATE
+        value: "0.08"

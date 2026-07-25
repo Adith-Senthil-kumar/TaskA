@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0E10;--surf:#14181C;--surf2:#1B2126;--line:#2A3238;--ink:#F1F5F6;--ink2:#9BAAB2;--ink3:#6B787F;--local:#FFB020;--localsoft:rgba(255,176,32,.13);--fail:#FF6E4D;--failsoft:rgba(255,110,77,.13);--conf:#B69CFF;--confsoft:rgba(182,156,255,.14);--tr:#5BAEFF;--trsoft:rgba(91,174,255,.13);--ok:#5BD98A;--oksoft:rgba(91,217,138,.13)}
+[data-tm="light"]{--bg:#EAE8E2;--surf:#FCFBF8;--surf2:#F2F0EA;--line:#D9D4C9;--ink:#12171A;--ink2:#576165;--ink3:#899197;--local:#9A5600;--localsoft:rgba(154,86,0,.10);--fail:#B22F14;--failsoft:rgba(178,47,20,.09);--conf:#5432BE;--confsoft:rgba(84,50,190,.10);--tr:#0A60B8;--trsoft:rgba(10,96,184,.09);--ok:#0F7440;--oksoft:rgba(15,116,64,.10)}
+body{margin:0;background:#16191C;font-family:Archivo,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8FC6FF;text-decoration:none}a:hover{color:#B8DCFF}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+input,textarea{font-family:inherit}
+@keyframes lmpulse{0%,100%{opacity:1}50%{opacity:.32}}
+@keyframes lmspin{to{transform:rotate(360deg)}}
+@keyframes lmsweep{0%{transform:translateX(-60%)}100%{transform:translateX(460%)}}
+@keyframes lmup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes lmsheet{from{transform:translateY(101%)}to{transform:none}}
+@keyframes lmpop{0%{transform:scale(.55);opacity:0}62%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes lmshim{0%{opacity:.35}50%{opacity:.7}100%{opacity:.35}}
+@keyframes lmring{from{box-shadow:0 0 0 0 var(--oksoft)}to{box-shadow:0 0 0 26px rgba(0,0,0,0)}}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+
+<div style="display:flex;align-items:flex-start;gap:34px;padding:44px 48px 64px;min-height:100vh;box-sizing:border-box">
+
+  <aside style="width:252px;flex:none;display:flex;flex-direction:column;gap:22px;color:#C6CFD4;font-size:12px;position:sticky;top:44px">
+    <div style="display:flex;flex-direction:column;gap:5px">
+      <div style="font:700 19px/1 Archivo;color:#fff;letter-spacing:-.01em">Lastmile</div>
+      <div style="font:500 11px/1.4 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.06em;text-transform:uppercase">Driver app · prototype</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Route direction</div>
+      <sc-for list="{{ variants }}" as="v" hint-placeholder-count="3">
+        <button onClick="{{ v.on }}" style="display:flex;flex-direction:column;gap:3px;text-align:left;padding:10px 12px;border-radius:9px;cursor:pointer;border:1px solid {{ v.bd }};background:{{ v.bg }};color:{{ v.fg }}">
+          <span style="display:flex;align-items:baseline;gap:7px"><span style="font:700 10px/1 'JetBrains Mono',monospace;color:{{ v.idc }}">{{ v.id }}</span><span style="font:600 13px/1.2 Archivo">{{ v.label }}</span></span>
+          <span style="font:400 11px/1.35 Archivo;color:{{ v.dim }}">{{ v.desc }}</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">States</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="7">
+          <button onClick="{{ s.on }}" style="padding:7px 10px;border-radius:7px;cursor:pointer;font:600 11.5px/1 Archivo;border:1px solid {{ s.bd }};background:{{ s.bg }};color:{{ s.fg }}">{{ s.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Appearance</div>
+      <div style="display:flex;gap:6px">
+        <sc-for list="{{ themes }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.on }}" style="flex:1;padding:8px 0;border-radius:7px;cursor:pointer;font:600 11.5px/1 Archivo;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ toggleConn }}" style="margin-top:2px;padding:9px 11px;border-radius:8px;cursor:pointer;text-align:left;font:600 12px/1 Archivo;border:1px solid {{ connBtn.bd }};background:{{ connBtn.bg }};color:{{ connBtn.fg }}">{{ connBtn.label }}</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;padding-top:18px;border-top:1px solid #262B2F">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Sync language</div>
+      <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span style="width:13px;height:13px;flex:none;margin-top:2px;border-radius:3px;border:1.5px {{ l.st }} {{ l.c }};background:{{ l.f }}"></span>
+          <span style="display:flex;flex-direction:column;gap:1px"><span style="font:600 11.5px/1.2 Archivo;color:#DDE4E7">{{ l.t }}</span><span style="font:400 11px/1.35 Archivo;color:#7E8A90">{{ l.d }}</span></span>
+        </div>
+      </sc-for>
+    </div>
+  </aside>
+
+  <div style="flex:none">
+    <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ isDark }}" hint-size="402px,874px">
+      <div data-tm="{{ tm }}" style="position:relative;height:874px;overflow:hidden;background:var(--bg);color:var(--ink);display:flex;flex-direction:column">
+
+        <div style="height:54px;flex:none"></div>
+
+        <div style="flex:none;display:flex;align-items:center;gap:11px;padding:9px 16px 10px;background:{{ strip.bg }};border-bottom:1px solid {{ strip.line }};position:relative;overflow:hidden">
+          <sc-if value="{{ strip.sweep }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;inset:0;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,var(--localsoft),transparent);animation:lmsweep 1.5s linear infinite"></div></div>
+          </sc-if>
+          <div style="position:relative;flex:none;display:flex;align-items:flex-end;gap:2px;height:14px;width:16px">
+            <span style="width:3px;height:5px;border-radius:1px;background:{{ strip.b1 }}"></span>
+            <span style="width:3px;height:9px;border-radius:1px;background:{{ strip.b2 }}"></span>
+            <span style="width:3px;height:13px;border-radius:1px;background:{{ strip.b3 }}"></span>
+            <sc-if value="{{ strip.slash }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;left:-2px;top:6px;width:20px;height:1.5px;background:var(--ink2);transform:rotate(-34deg)"></span>
+            </sc-if>
+          </div>
+          <div style="position:relative;flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+            <div style="font:600 13px/1.25 Archivo;color:{{ strip.fg }};letter-spacing:-.005em">{{ strip.title }}</div>
+            <div style="font:500 11px/1.25 'JetBrains Mono',monospace;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ strip.meta }}</div>
+          </div>
+          <sc-if value="{{ strip.hasAction }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ strip.action }}" style="position:relative;flex:none;padding:7px 12px;border-radius:20px;cursor:pointer;font:600 12px/1 Archivo;border:1px solid {{ strip.fg }};background:transparent;color:{{ strip.fg }}">{{ strip.actionLabel }}</button>
+          </sc-if>
+        </div>
+
+        <div style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain">
+
+          <sc-if value="{{ onRoute }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="padding:16px 16px 12px;display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.11em;text-transform:uppercase">Today’s route</div>
+                    <div style="font:700 26px/1.05 Archivo;letter-spacing:-.025em">{{ prog.headline }}</div>
+                  </div>
+                  <div style="text-align:right;font:500 11px/1.4 'JetBrains Mono',monospace;color:var(--ink3)">{{ prog.sub }}</div>
+                </div>
+                <div style="display:flex;gap:3px;height:8px">
+                  <sc-for list="{{ prog.segs }}" as="g" hint-placeholder-count="12">
+                    <span style="flex:1;border-radius:2px;background:{{ g.bg }};border:1px {{ g.st }} {{ g.bd }};box-sizing:border-box"></span>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:7px;overflow-x:auto;padding:2px 16px 14px">
+                <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+                  <button onClick="{{ f.on }}" style="flex:none;display:flex;align-items:center;gap:6px;padding:9px 13px;border-radius:22px;cursor:pointer;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }}">
+                    <span style="font:600 12.5px/1 Archivo">{{ f.label }}</span>
+                    <span style="font:600 11px/1 'JetBrains Mono',monospace;opacity:.65">{{ f.count }}</span>
+                  </button>
+                </sc-for>
+              </div>
+
+              <sc-if value="{{ emptyRoute }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:44px 26px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center">
+                  <div style="width:56px;height:56px;border-radius:14px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center"><span style="width:16px;height:16px;border-radius:4px;border:1.5px dashed var(--ink3)"></span></div>
+                  <div style="font:700 19px/1.25 Archivo;letter-spacing:-.02em">No route yet</div>
+                  <div style="font:400 13.5px/1.5 Archivo;color:var(--ink2);max-width:250px">Dispatch hasn’t assigned your stops. The app checked {{ lastCheck }} — you don’t need signal for it to appear once it has.</div>
+                  <button onClick="{{ syncNow }}" style="margin-top:4px;padding:12px 20px;border-radius:11px;cursor:pointer;font:600 13.5px/1 Archivo;border:1px solid var(--line);background:var(--surf);color:var(--ink)">Check again</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ emptyFilter }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:6px 16px 20px;padding:26px 20px;border-radius:14px;background:var(--surf);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center">
+                  <div style="font:700 16px/1.3 Archivo;letter-spacing:-.015em">{{ emptyFilterTitle }}</div>
+                  <div style="font:400 13px/1.45 Archivo;color:var(--ink2);max-width:230px">{{ emptyFilterBody }}</div>
+                  <button onClick="{{ clearFilter }}" style="margin-top:5px;padding:9px 15px;border-radius:9px;cursor:pointer;font:600 12.5px/1 Archivo;border:1px solid var(--line);background:var(--surf2);color:var(--ink)">Show all {{ total }} stops</button>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ routeA }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;padding-bottom:12px">
+                  <sc-for list="{{ visible }}" as="o" hint-placeholder-count="6">
+                    <button onClick="{{ o.open }}" style="display:flex;align-items:stretch;gap:0;width:100%;padding:0;cursor:pointer;text-align:left;background:{{ o.rowBg }};border:0;border-bottom:1px solid var(--line)">
+                      <span style="flex:none;width:3px;background:{{ o.rail }}"></span>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:7px;padding:15px 16px 15px 13px">
+                        <span style="display:flex;align-items:center;gap:8px">
+                          <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.05em">{{ o.no }}</span>
+                          <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.06em">STOP {{ o.stopPad }}</span>
+                          <span style="flex:1"></span>
+                          <span style="display:flex;align-items:center;gap:5px">
+                            <span style="width:13px;height:13px;border-radius:3px;border:1.5px {{ o.chip.st }} {{ o.chip.c }};background:{{ o.chip.f }};animation:{{ o.chip.an }}"></span>
+                            <span style="font:600 10.5px/1 Archivo;color:{{ o.chip.lc }};letter-spacing:.01em">{{ o.chip.l }}</span>
+                          </span>
+                        </span>
+                        <span style="display:flex;flex-direction:column;gap:2px">
+                          <span style="font:600 17px/1.2 Archivo;color:var(--ink);letter-spacing:-.015em">{{ o.name }}</span>
+                          <span style="font:400 13px/1.35 Archivo;color:var(--ink2)">{{ o.addr }}</span>
+                        </span>
+                        <span style="display:flex;align-items:center;gap:8px;margin-top:1px">
+                          <span style="padding:4px 8px;border-radius:5px;font:600 10.5px/1 Archivo;letter-spacing:.05em;text-transform:uppercase;color:{{ o.stFg }};background:{{ o.stBg }}">{{ o.status }}</span>
+                          <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ o.itemsLabel }}</span>
+                          <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">· {{ o.win }}</span>
+                        </span>
+                      </span>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ routeB }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:0;padding:0 16px 16px">
+                  <sc-for list="{{ visible }}" as="o" hint-placeholder-count="6">
+                    <div style="display:flex;gap:12px;align-items:stretch">
+                      <div style="flex:none;width:34px;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:14px">
+                        <span style="font:700 12px/1 'JetBrains Mono',monospace;color:{{ o.gutterFg }}">{{ o.stopPad }}</span>
+                        <span style="flex:1;width:1px;background:var(--line)"></span>
+                      </div>
+                      <button onClick="{{ o.open }}" style="flex:1;min-width:0;margin:7px 0;padding:13px 14px;border-radius:12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:7px;background:{{ o.cardBg }};border:1.5px {{ o.cardSt }} {{ o.cardBd }};opacity:{{ o.cardOp }}">
+                        <span style="display:flex;align-items:center;gap:8px">
+                          <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.05em">{{ o.no }}</span>
+                          <span style="flex:1"></span>
+                          <span style="width:12px;height:12px;border-radius:3px;border:1.5px {{ o.chip.st }} {{ o.chip.c }};background:{{ o.chip.f }};animation:{{ o.chip.an }}"></span>
+                        </span>
+                        <span style="font:600 16.5px/1.2 Archivo;color:var(--ink);letter-spacing:-.015em">{{ o.name }}</span>
+                        <span style="font:400 12.5px/1.35 Archivo;color:var(--ink2)">{{ o.addr }}</span>
+                        <span style="display:flex;align-items:center;gap:7px;margin-top:2px">
+                          <span style="padding:3px 7px;border-radius:5px;font:600 10px/1 Archivo;letter-spacing:.05em;text-transform:uppercase;color:{{ o.stFg }};background:{{ o.stBg }}">{{ o.status }}</span>
+                          <span style="font:500 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ o.itemsLabel }}</span>
+                          <span style="flex:1"></span>
+                          <span style="font:600 10.5px/1 Archivo;color:{{ o.chip.lc }}">{{ o.chip.l }}</span>
+                        </span>
+                      </button>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ routeC }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:16px;padding:0 16px 16px">
+                  <sc-if value="{{ hasHero }}" hint-placeholder-val="{{ false }}">
+                    <div style="border-radius:16px;background:var(--surf);border:1px solid var(--line);overflow:hidden">
+                      <div style="padding:14px 16px 0;display:flex;align-items:center;gap:8px">
+                        <span style="font:700 10px/1 'JetBrains Mono',monospace;color:var(--local);letter-spacing:.12em;text-transform:uppercase">Next stop</span>
+                        <span style="flex:1"></span>
+                        <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.05em">{{ hero.no }} · STOP {{ hero.stopPad }}</span>
+                      </div>
+                      <button onClick="{{ hero.open }}" style="display:block;width:100%;text-align:left;background:transparent;border:0;cursor:pointer;padding:9px 16px 14px">
+                        <span style="display:block;font:700 24px/1.12 Archivo;color:var(--ink);letter-spacing:-.025em">{{ hero.name }}</span>
+                        <span style="display:block;margin-top:5px;font:400 14px/1.4 Archivo;color:var(--ink2)">{{ hero.addr }}</span>
+                        <span style="display:flex;gap:8px;margin-top:11px;align-items:center">
+                          <span style="padding:4px 8px;border-radius:5px;font:600 10.5px/1 Archivo;letter-spacing:.05em;text-transform:uppercase;color:{{ hero.stFg }};background:{{ hero.stBg }}">{{ hero.status }}</span>
+                          <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ hero.itemsLabel }} · {{ hero.win }}</span>
+                        </span>
+                      </button>
+                      <div style="display:flex;gap:8px;padding:0 16px 15px">
+                        <button onClick="{{ hero.quickDelivered }}" style="flex:1;padding:14px 0;border-radius:11px;cursor:pointer;font:600 14px/1 Archivo;border:0;background:var(--ok);color:var(--bg)">Delivered</button>
+                        <button onClick="{{ hero.quickFailed }}" style="flex:1;padding:14px 0;border-radius:11px;cursor:pointer;font:600 14px/1 Archivo;border:1px solid var(--fail);background:var(--failsoft);color:var(--fail)">Couldn’t deliver</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.11em;text-transform:uppercase;padding:0 2px 8px">Then ({{ restCount }})</div>
+                    <sc-for list="{{ rest }}" as="o" hint-placeholder-count="5">
+                      <button onClick="{{ o.open }}" style="display:flex;align-items:center;gap:11px;width:100%;padding:13px 12px;cursor:pointer;text-align:left;border-radius:10px;background:{{ o.rowBg }};border:0;border-bottom:1px solid var(--line)">
+                        <span style="flex:none;width:24px;font:700 12px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ o.stopPad }}</span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                          <span style="font:600 15px/1.2 Archivo;color:var(--ink);letter-spacing:-.01em">{{ o.name }}</span>
+                          <span style="font:400 12px/1.3 Archivo;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.addr }}</span>
+                        </span>
+                        <span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+                          <span style="width:12px;height:12px;border-radius:3px;border:1.5px {{ o.chip.st }} {{ o.chip.c }};background:{{ o.chip.f }};animation:{{ o.chip.an }}"></span>
+                          <span style="font:600 10px/1 Archivo;letter-spacing:.04em;text-transform:uppercase;color:{{ o.stFg }}">{{ o.status }}</span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:lmup .18s ease-out">
+              <div style="padding:12px 16px 16px;display:flex;flex-direction:column;gap:14px">
+                <button onClick="{{ back }}" style="align-self:flex-start;display:flex;align-items:center;gap:7px;padding:8px 12px 8px 9px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:var(--surf);color:var(--ink2);font:600 12.5px/1 Archivo">
+                  <span style="display:inline-block;width:7px;height:7px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg)"></span>Route
+                </button>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <span style="font:600 11px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.06em">{{ det.no }}</span>
+                    <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.06em">STOP {{ det.stopPad }} OF {{ total }}</span>
+                  </div>
+                  <div style="font:700 28px/1.08 Archivo;letter-spacing:-.028em">{{ det.name }}</div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="padding:5px 9px;border-radius:6px;font:600 11px/1 Archivo;letter-spacing:.05em;text-transform:uppercase;color:{{ det.stFg }};background:{{ det.stBg }}">{{ det.status }}</span>
+                    <span style="display:flex;align-items:center;gap:6px;padding:4px 9px 4px 7px;border-radius:6px;background:var(--surf2)">
+                      <span style="width:12px;height:12px;border-radius:3px;border:1.5px {{ det.chip.st }} {{ det.chip.c }};background:{{ det.chip.f }};animation:{{ det.chip.an }}"></span>
+                      <span style="font:600 11px/1 Archivo;color:{{ det.chip.lc }}">{{ det.chip.l }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <sc-if value="{{ det.hasConflict }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:0 16px 16px;border-radius:14px;border:1.5px solid var(--conf);background:var(--confsoft);overflow:hidden">
+                  <div style="padding:14px 15px;display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <span style="width:13px;height:13px;border-radius:3px;border:1.5px solid var(--conf);background:linear-gradient(135deg,var(--conf) 0 50%,transparent 50% 100%)"></span>
+                      <span style="font:700 13px/1 Archivo;color:var(--conf);letter-spacing:.01em">Two versions of this stop</span>
+                    </div>
+                    <div style="font:400 13px/1.45 Archivo;color:var(--ink2)">Your phone and the server disagree, and the difference isn’t one we can settle for you.</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:1px;background:var(--line)">
+                    <div style="padding:12px 15px;background:var(--surf);display:flex;flex-direction:column;gap:4px">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline">
+                        <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--local);letter-spacing:.09em;text-transform:uppercase">On your phone</span>
+                        <span style="font:500 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ det.cf.localAt }}</span>
+                      </div>
+                      <div style="font:600 16px/1.2 Archivo">{{ det.cf.localStatus }}</div>
+                      <div style="font:400 12.5px/1.4 Archivo;color:var(--ink2)">{{ det.cf.localNote }}</div>
+                    </div>
+                    <div style="padding:12px 15px;background:var(--surf);display:flex;flex-direction:column;gap:4px">
+                      <div style="display:flex;justify-content:space-between;align-items:baseline">
+                        <span style="font:600 10.5px/1 'JetBrains Mono',monospace;color:var(--tr);letter-spacing:.09em;text-transform:uppercase">On the server</span>
+                        <span style="font:500 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ det.cf.serverAt }}</span>
+                      </div>
+                      <div style="font:600 16px/1.2 Archivo">{{ det.cf.serverStatus }}</div>
+                      <div style="font:400 12.5px/1.4 Archivo;color:var(--ink2)">{{ det.cf.serverNote }}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:13px 15px 15px">
+                    <button onClick="{{ keepMine }}" style="padding:14px 0;border-radius:11px;cursor:pointer;font:600 14px/1 Archivo;border:0;background:var(--conf);color:var(--bg)">Keep mine — {{ det.cf.localStatus }}</button>
+                    <button onClick="{{ keepServer }}" style="padding:13px 0;border-radius:11px;cursor:pointer;font:600 13.5px/1 Archivo;border:1px solid var(--line);background:var(--surf2);color:var(--ink)">Use the server’s — {{ det.cf.serverStatus }}</button>
+                    <div style="font:400 11.5px/1.4 Archivo;color:var(--ink3);text-align:center">Whichever you pick is recorded as your decision, with your name on it.</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="margin:0 16px 16px;border-radius:14px;background:var(--surf);border:1px solid var(--line);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 15px;border-bottom:1px solid var(--line)">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Deliver to</div>
+                    <div style="font:500 14.5px/1.4 Archivo;color:var(--ink)">{{ det.addr }}</div>
+                    <div style="font:400 13px/1.4 Archivo;color:var(--ink2)">{{ det.addr2 }}</div>
+                  </div>
+                  <button onClick="{{ noop }}" style="flex:none;width:46px;height:46px;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:var(--surf2);color:var(--ink);display:flex;align-items:center;justify-content:center">
+                    <svg width="19" height="19" viewBox="0 0 20 20" fill="none"><path d="M10 18s6.5-5.2 6.5-10a6.5 6.5 0 1 0-13 0C3.5 12.8 10 18 10 18Z" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.6"/></svg>
+                  </button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Window</div>
+                    <div style="font:600 14.5px/1.3 Archivo;color:var(--ink)">{{ det.win }}</div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Phone</div>
+                    <div style="font:600 14.5px/1.3 Archivo;color:var(--ink)">{{ det.phone }}</div>
+                  </div>
+                  <button onClick="{{ noop }}" style="flex:none;width:46px;height:46px;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:var(--surf2);color:var(--ink);display:flex;align-items:center;justify-content:center">
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M6.2 3h-2A1.2 1.2 0 0 0 3 4.2C3 10.7 9.3 17 15.8 17A1.2 1.2 0 0 0 17 15.8v-2a1 1 0 0 0-.8-1l-2.6-.5a1 1 0 0 0-1 .4l-.7 1a11 11 0 0 1-4.1-4.1l1-.7a1 1 0 0 0 .4-1L8.7 4a1 1 0 0 0-1-.9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <sc-if value="{{ det.hasNotes }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:13px 15px;display:flex;flex-direction:column;gap:4px;background:var(--surf2)">
+                    <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Note from customer</div>
+                    <div style="font:400 14px/1.45 Archivo;color:var(--ink)">“{{ det.notes }}”</div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="margin:0 16px 16px;border-radius:14px;background:var(--surf);border:1px solid var(--line);overflow:hidden">
+                <div style="padding:13px 15px 11px;display:flex;align-items:baseline;gap:8px;border-bottom:1px solid var(--line)">
+                  <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Items</span>
+                  <span style="font:600 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ det.itemsLabel }}</span>
+                </div>
+                <sc-for list="{{ det.items }}" as="it" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line)">
+                    <span style="flex:none;min-width:30px;padding:4px 7px;border-radius:6px;background:var(--surf2);font:700 12.5px/1 'JetBrains Mono',monospace;color:var(--ink);text-align:center">×{{ it.q }}</span>
+                    <span style="flex:1;font:500 14px/1.35 Archivo;color:var(--ink)">{{ it.n }}</span>
+                    <span style="font:500 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ it.sku }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="margin:0 16px 24px;border-radius:14px;background:var(--surf);border:1px solid var(--line);overflow:hidden">
+                <div style="padding:13px 15px 11px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px">
+                  <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">History</span>
+                  <span style="font:400 12px/1.35 Archivo;color:var(--ink3)">Every change, and whether the server has it.</span>
+                </div>
+                <div style="padding:6px 15px 12px">
+                  <sc-for list="{{ det.hist }}" as="h" hint-placeholder-count="3">
+                    <div style="display:flex;gap:12px;align-items:stretch">
+                      <div style="flex:none;width:13px;display:flex;flex-direction:column;align-items:center">
+                        <span style="margin-top:14px;width:13px;height:13px;flex:none;border-radius:3px;border:1.5px {{ h.chip.st }} {{ h.chip.c }};background:{{ h.chip.f }};animation:{{ h.chip.an }}"></span>
+                        <span style="flex:1;width:1.5px;background:var(--line);border-radius:1px"></span>
+                      </div>
+                      <div style="flex:1;padding:11px 0 12px;display:flex;flex-direction:column;gap:3px">
+                        <div style="display:flex;align-items:baseline;gap:8px">
+                          <span style="font:600 14.5px/1.2 Archivo;color:var(--ink)">{{ h.label }}</span>
+                          <span style="flex:1"></span>
+                          <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ h.at }}</span>
+                        </div>
+                        <div style="font:500 11.5px/1.3 Archivo;color:{{ h.chip.lc }}">{{ h.syncLabel }}</div>
+                        <sc-if value="{{ h.hasDetail }}" hint-placeholder-val="{{ false }}">
+                          <div style="margin-top:4px;font:400 12.5px/1.4 Archivo;color:var(--ink2)">{{ h.detail }}</div>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="height:96px"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onOutbox }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.11em;text-transform:uppercase">On this phone</div>
+                <div style="font:700 26px/1.05 Archivo;letter-spacing:-.025em">{{ ob.headline }}</div>
+                <div style="margin-top:5px;font:400 13.5px/1.45 Archivo;color:var(--ink2)">{{ ob.sub }}</div>
+              </div>
+
+              <div style="border-radius:14px;background:{{ ob.cardBg }};border:1.5px solid {{ ob.cardBd }};padding:15px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+                    <div style="font:700 15px/1.2 Archivo;color:{{ ob.connFg }}">{{ ob.connTitle }}</div>
+                    <div style="font:500 11.5px/1.3 'JetBrains Mono',monospace;color:var(--ink3)">Last confirmed {{ ob.lastSync }}</div>
+                  </div>
+                  <sc-if value="{{ syncing }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:20px;height:20px;flex:none;border-radius:50%;border:2px solid var(--localsoft);border-top-color:var(--local);animation:lmspin .7s linear infinite"></span>
+                  </sc-if>
+                </div>
+                <button onClick="{{ syncNow }}" style="padding:15px 0;border-radius:12px;cursor:pointer;font:600 15px/1 Archivo;border:1px solid {{ ob.btnBd }};background:{{ ob.btnBg }};color:{{ ob.btnFg }}">{{ ob.btnLabel }}</button>
+              </div>
+
+              <sc-if value="{{ ob.hasConflicts }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ ob.openConflict }}" style="text-align:left;border-radius:14px;background:var(--confsoft);border:1.5px solid var(--conf);padding:14px 15px;cursor:pointer;display:flex;align-items:center;gap:12px">
+                  <span style="width:15px;height:15px;flex:none;border-radius:4px;border:1.5px solid var(--conf);background:linear-gradient(135deg,var(--conf) 0 50%,transparent 50% 100%)"></span>
+                  <span style="flex:1;display:flex;flex-direction:column;gap:3px">
+                    <span style="font:700 14px/1.2 Archivo;color:var(--conf)">{{ ob.conflictTitle }}</span>
+                    <span style="font:400 12.5px/1.35 Archivo;color:var(--ink2)">Nothing else is stuck behind it. Decide when you have a moment.</span>
+                  </span>
+                  <span style="flex:none;width:8px;height:8px;border-right:1.5px solid var(--conf);border-top:1.5px solid var(--conf);transform:rotate(45deg)"></span>
+                </button>
+              </sc-if>
+
+              <sc-if value="{{ ob.caughtUp }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:34px 20px 40px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;animation:lmup .3s ease-out">
+                  <div style="width:74px;height:74px;border-radius:50%;background:var(--oksoft);display:flex;align-items:center;justify-content:center;animation:lmpop .42s cubic-bezier(.2,1.3,.4,1),lmring 1.6s ease-out .3s">
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.8 9.6 17.4 19 8" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div style="font:700 21px/1.2 Archivo;letter-spacing:-.02em">Nothing left on the phone</div>
+                  <div style="font:400 13.5px/1.5 Archivo;color:var(--ink2);max-width:262px">Every change you’ve made today is on the server. {{ ob.caughtMeta }}</div>
+                  <div style="margin-top:6px;display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:20px;background:var(--surf2)">
+                    <span style="width:11px;height:11px;border-radius:3px;background:var(--ink3)"></span>
+                    <span style="font:600 11.5px/1 Archivo;color:var(--ink3)">Queue empty · 0 waiting</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ ob.hasQueue }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:baseline;gap:8px;padding:0 2px">
+                    <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.11em;text-transform:uppercase">Waiting to send</span>
+                    <span style="flex:1"></span>
+                    <span style="font:600 11px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ ob.queueCount }} in order</span>
+                  </div>
+                  <sc-for list="{{ ob.queue }}" as="q" hint-placeholder-count="3">
+                    <div style="border-radius:12px;background:var(--surf);border:1px solid {{ q.bd }};overflow:hidden">
+                      <div style="display:flex;align-items:flex-start;gap:11px;padding:13px 14px">
+                        <span style="margin-top:2px;width:13px;height:13px;flex:none;border-radius:3px;border:1.5px {{ q.chip.st }} {{ q.chip.c }};background:{{ q.chip.f }};animation:{{ q.chip.an }}"></span>
+                        <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                          <span style="font:600 14px/1.25 Archivo;color:var(--ink)">{{ q.label }}</span>
+                          <span style="font:500 11.5px/1.35 'JetBrains Mono',monospace;color:var(--ink3)">{{ q.no }} · {{ q.name }}</span>
+                        </span>
+                        <span style="flex:none;text-align:right;display:flex;flex-direction:column;gap:3px">
+                          <span style="font:600 11.5px/1 'JetBrains Mono',monospace;color:{{ q.chip.lc }}">{{ q.waited }}</span>
+                          <span style="font:500 10.5px/1 Archivo;color:var(--ink3)">{{ q.attempts }}</span>
+                        </span>
+                      </div>
+                      <sc-if value="{{ q.hasReason }}" hint-placeholder-val="{{ false }}">
+                        <div style="padding:10px 14px;background:var(--failsoft);border-top:1px solid var(--line);font:400 12px/1.4 Archivo;color:var(--fail)">{{ q.reason }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                  <div style="padding:4px 2px 0;font:400 11.5px/1.45 Archivo;color:var(--ink3)">Changes send in the order you made them, so the server never sees a later state before an earlier one.</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onProfile }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:16px">
+              <div style="font:700 26px/1.05 Archivo;letter-spacing:-.025em">You & the van</div>
+              <div style="border-radius:14px;background:var(--surf);border:1px solid var(--line);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:13px;padding:15px">
+                  <div style="width:48px;height:48px;flex:none;border-radius:13px;background:var(--surf2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:700 17px/1 Archivo;color:var(--ink2)">DK</div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:700 17px/1.2 Archivo;letter-spacing:-.015em">Dana Køhler</div>
+                    <div style="font:500 11.5px/1.3 'JetBrains Mono',monospace;color:var(--ink3)">DRIVER 2841 · Shift 06:30–15:00</div>
+                  </div>
+                </div>
+                <div style="display:flex;border-top:1px solid var(--line)">
+                  <div style="flex:1;padding:13px 15px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--line)">
+                    <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Vehicle</span>
+                    <span style="font:600 14px/1.3 Archivo">Van 14 · Medium</span>
+                  </div>
+                  <div style="flex:1;padding:13px 15px;display:flex;flex-direction:column;gap:3px">
+                    <span style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Plate</span>
+                    <span style="font:600 14px/1.3 'JetBrains Mono',monospace">LM · 41 · 208</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border-radius:14px;background:var(--surf);border:1px solid var(--line);padding:14px 15px;display:flex;flex-direction:column;gap:11px">
+                <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Screen</div>
+                <div style="display:flex;gap:7px">
+                  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="3">
+                    <button onClick="{{ t.on }}" style="flex:1;padding:12px 0;border-radius:10px;cursor:pointer;font:600 13px/1 Archivo;border:1px solid {{ t.pbd }};background:{{ t.pbg }};color:{{ t.pfg }}">{{ t.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="font:400 11.5px/1.4 Archivo;color:var(--ink3)">{{ themeNote }}</div>
+              </div>
+
+              <div style="border-radius:14px;background:var(--surf);border:1px solid var(--line);padding:14px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="font:600 10px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase">Storage on this phone</div>
+                <div style="display:flex;align-items:baseline;gap:8px">
+                  <span style="font:700 22px/1 Archivo;letter-spacing:-.02em">{{ storage.used }}</span>
+                  <span style="font:500 12px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ storage.detail }}</span>
+                </div>
+                <div style="height:7px;border-radius:4px;background:var(--surf2);overflow:hidden;display:flex">
+                  <span style="width:{{ storage.pct }};background:var(--local)"></span>
+                </div>
+                <div style="font:400 11.5px/1.4 Archivo;color:var(--ink3)">Photos are the big ones. They’re deleted from the phone once the server confirms it has them.</div>
+              </div>
+
+              <button onClick="{{ askSignOut }}" style="padding:15px 0;border-radius:12px;cursor:pointer;font:600 14.5px/1 Archivo;border:1px solid var(--line);background:var(--surf);color:var(--fail)">Sign out</button>
+              <div style="font:400 11.5px/1.45 Archivo;color:var(--ink3);text-align:center;padding:0 12px">Lastmile 4.2.1 · works with no signal · your work is stored on this device until the server confirms it</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="flex:none;display:flex;padding:7px 8px 26px;background:var(--surf);border-top:1px solid var(--line)">
+          <button onClick="{{ goRoute }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0 6px;background:transparent;border:0;cursor:pointer;color:{{ tabs.route }}">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.7"/><circle cx="18" cy="18" r="2.6" stroke="currentColor" stroke-width="1.7"/><path d="M6 8.6v3.9a3 3 0 0 0 3 3h6a3 3 0 0 1 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span style="font:600 10.5px/1 Archivo;letter-spacing:.02em">Route</span>
+          </button>
+          <button onClick="{{ goOutbox }}" style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0 6px;background:transparent;border:0;cursor:pointer;color:{{ tabs.outbox }}">
+            <span style="position:relative">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 15V4m0 0L7.8 8.2M12 4l4.2 4.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:-3px;right:-9px;min-width:17px;height:17px;padding:0 4px;box-sizing:border-box;border-radius:9px;background:{{ badge.bg }};color:{{ badge.fg }};font:700 10.5px/17px 'JetBrains Mono',monospace;text-align:center">{{ badge.n }}</span>
+              </sc-if>
+            </span>
+            <span style="font:600 10.5px/1 Archivo;letter-spacing:.02em">Outbox</span>
+          </button>
+          <button onClick="{{ goProfile }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0 6px;background:transparent;border:0;cursor:pointer;color:{{ tabs.profile }}">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c.9-3.4 3.6-5.2 7-5.2s6.1 1.8 7 5.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <span style="font:600 10.5px/1 Archivo;letter-spacing:.02em">Profile</span>
+          </button>
+        </div>
+
+        <sc-if value="{{ showUpdateCta }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;bottom:82px;padding:12px 16px 14px;background:linear-gradient(to top,var(--bg) 62%,transparent)">
+            <button onClick="{{ openUpdate }}" style="width:100%;padding:17px 0;border-radius:13px;cursor:pointer;font:700 15.5px/1 Archivo;letter-spacing:-.005em;border:0;background:var(--ink);color:var(--bg)">Update status</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;animation:lmsheet .24s cubic-bezier(.2,.8,.25,1);z-index:5">
+            <div style="height:54px;flex:none"></div>
+            <div style="flex:none;display:flex;align-items:center;gap:12px;padding:10px 16px 12px;border-bottom:1px solid var(--line)">
+              <button onClick="{{ closeSheet }}" style="flex:none;width:38px;height:38px;border-radius:10px;cursor:pointer;border:1px solid var(--line);background:var(--surf);color:var(--ink2);display:flex;align-items:center;justify-content:center;font:400 19px/1 Archivo">×</button>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                <div style="font:700 15px/1.2 Archivo;letter-spacing:-.015em">{{ sheet.name }}</div>
+                <div style="font:500 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.05em">{{ sheet.no }} · STOP {{ sheet.stopPad }}</div>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:18px 16px 20px;display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font:700 21px/1.2 Archivo;letter-spacing:-.022em">What happened here?</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ sheet.choices }}" as="c" hint-placeholder-count="4">
+                    <button onClick="{{ c.on }}" style="display:flex;align-items:center;gap:12px;padding:17px 15px;border-radius:13px;cursor:pointer;text-align:left;border:1.5px solid {{ c.bd }};background:{{ c.bg }};color:{{ c.fg }}">
+                      <span style="flex:none;width:20px;height:20px;border-radius:50%;border:2px solid {{ c.dot }};background:{{ c.dotFill }};box-sizing:border-box"></span>
+                      <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                        <span style="font:700 16px/1.2 Archivo;letter-spacing:-.012em">{{ c.label }}</span>
+                        <span style="font:400 12px/1.3 Archivo;opacity:.72">{{ c.hint }}</span>
+                      </span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <sc-if value="{{ sheet.needReason }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:11px;animation:lmup .2s ease-out">
+                  <div style="font:700 15px/1.2 Archivo;letter-spacing:-.015em">Why not?</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px">
+                    <sc-for list="{{ sheet.reasons }}" as="r" hint-placeholder-count="4">
+                      <button onClick="{{ r.on }}" style="padding:13px 15px;border-radius:11px;cursor:pointer;font:600 13.5px/1 Archivo;border:1.5px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button>
+                    </sc-for>
+                  </div>
+                  <textarea value="{{ sheet.notes }}" onChange="{{ setNotes }}" placeholder="Anything dispatch should know (optional)" rows="3" style="width:100%;box-sizing:border-box;resize:none;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surf);color:var(--ink);font:400 14px/1.45 Archivo"></textarea>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ sheet.needProof }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:11px;animation:lmup .2s ease-out">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="font:700 15px/1.2 Archivo;letter-spacing:-.015em">Proof</span>
+                    <span style="font:500 11.5px/1 Archivo;color:var(--ink3)">optional</span>
+                  </div>
+                  <input value="{{ sheet.recipient }}" onChange="{{ setRecipient }}" placeholder="Who took it?" style="width:100%;box-sizing:border-box;padding:15px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surf);color:var(--ink);font:500 15px/1 Archivo">
+                  <sc-if value="{{ sheet.noPhoto }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ capturePhoto }}" style="display:flex;align-items:center;gap:13px;padding:15px;border-radius:12px;cursor:pointer;text-align:left;border:1.5px dashed var(--line);background:var(--surf);color:var(--ink)">
+                      <span style="flex:none;width:44px;height:44px;border-radius:10px;background:var(--surf2);display:flex;align-items:center;justify-content:center">
+                        <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><rect x="3" y="6.5" width="18" height="13.5" rx="2.5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13.2" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M8.6 6.5 9.8 4h4.4l1.2 2.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                      </span>
+                      <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                        <span style="font:600 14.5px/1.2 Archivo">Take a photo</span>
+                        <span style="font:400 12px/1.3 Archivo;color:var(--ink3)">Stays on the phone until it’s sent</span>
+                      </span>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ sheet.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                    <div style="border-radius:12px;border:1px solid var(--line);background:var(--surf);overflow:hidden;animation:lmup .2s ease-out">
+                      <div style="height:132px;background:var(--surf2);position:relative;display:flex;align-items:center;justify-content:center">
+                        <svg width="100%" height="132" viewBox="0 0 340 132" preserveAspectRatio="none" style="position:absolute;inset:0;opacity:.5"><path d="M0 0 340 132M340 0 0 132" stroke="var(--line)" stroke-width="1"/></svg>
+                        <span style="position:relative;font:600 11px/1 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.1em">PHOTO PLACEHOLDER</span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line)">
+                        <span style="width:13px;height:13px;flex:none;border-radius:3px;border:1.5px dashed var(--local);background:var(--localsoft)"></span>
+                        <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                          <span style="font:600 12.5px/1.2 Archivo;color:var(--local)">Stored on this device</span>
+                          <span style="font:500 10.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">1.4 MB · not uploaded</span>
+                        </span>
+                        <button onClick="{{ capturePhoto }}" style="flex:none;padding:8px 12px;border-radius:8px;cursor:pointer;font:600 12px/1 Archivo;border:1px solid var(--line);background:var(--surf2);color:var(--ink2)">Retake</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <div style="height:20px"></div>
+            </div>
+            <div style="flex:none;padding:13px 16px 30px;border-top:1px solid var(--line);background:var(--surf);display:flex;flex-direction:column;gap:9px">
+              <button onClick="{{ saveUpdate }}" style="width:100%;padding:18px 0;border-radius:13px;cursor:pointer;font:700 16px/1 Archivo;letter-spacing:-.01em;border:0;background:{{ sheet.saveBg }};color:{{ sheet.saveFg }};opacity:{{ sheet.saveOp }}">{{ sheet.saveLabel }}</button>
+              <div style="display:flex;align-items:center;justify-content:center;gap:7px">
+                <span style="width:11px;height:11px;border-radius:3px;border:1.5px {{ sheet.hintChip.st }} {{ sheet.hintChip.c }};background:{{ sheet.hintChip.f }}"></span>
+                <span style="font:500 11.5px/1.35 Archivo;color:var(--ink3);text-align:center">{{ sheet.hint }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ack.open }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--bg);z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:40px 30px;text-align:center">
+            <div style="width:80px;height:80px;border-radius:20px;border:2px {{ ack.chip.st }} {{ ack.chip.c }};background:{{ ack.chip.f }};display:flex;align-items:center;justify-content:center;animation:lmpop .4s cubic-bezier(.2,1.3,.4,1)">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 12.6 9.5 17 19 8" stroke="{{ ack.tick }}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font:700 24px/1.15 Archivo;letter-spacing:-.025em">{{ ack.title }}</div>
+            <div style="font:400 14.5px/1.5 Archivo;color:var(--ink2);max-width:270px">{{ ack.body }}</div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:20px;background:var(--surf);border:1px solid var(--line)">
+              <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ ack.meta }}</span>
+            </div>
+            <button onClick="{{ dismissAck }}" style="margin-top:10px;width:100%;max-width:300px;padding:17px 0;border-radius:13px;cursor:pointer;font:700 15.5px/1 Archivo;border:0;background:var(--ink);color:var(--bg)">Next stop</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--bg);z-index:7;display:flex;flex-direction:column">
+            <div style="height:54px;flex:none"></div>
+            <div style="padding:22px 16px;display:flex;flex-direction:column;gap:9px">
+              <div style="font:700 24px/1.1 Archivo;letter-spacing:-.025em">Getting your route</div>
+              <div style="font:400 13.5px/1.5 Archivo;color:var(--ink2)">First open today, so there’s nothing on the phone yet. This is the one moment the app needs signal.</div>
+              <div style="margin-top:6px;display:flex;align-items:center;gap:9px">
+                <span style="width:16px;height:16px;border-radius:50%;border:2px solid var(--surf2);border-top-color:var(--local);animation:lmspin .7s linear infinite"></span>
+                <span style="font:500 11.5px/1 'JetBrains Mono',monospace;color:var(--ink3)">{{ loadMsg }}</span>
+              </div>
+            </div>
+            <div style="padding:6px 16px;display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ skeleton }}" as="s" hint-placeholder-count="5">
+                <div style="border-radius:12px;background:var(--surf);border:1px solid var(--line);padding:15px;display:flex;flex-direction:column;gap:9px;opacity:{{ s.op }};animation:lmshim 1.5s ease-in-out infinite;animation-delay:{{ s.d }}">
+                  <span style="width:38%;height:9px;border-radius:4px;background:var(--surf2)"></span>
+                  <span style="width:70%;height:15px;border-radius:4px;background:var(--surf2)"></span>
+                  <span style="width:54%;height:11px;border-radius:4px;background:var(--surf2)"></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ signOut }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:8;display:flex;align-items:flex-end;padding:16px 14px 30px">
+            <div style="width:100%;border-radius:18px;background:var(--surf);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:13px;animation:lmup .2s ease-out">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:15px;height:15px;flex:none;border-radius:4px;border:1.5px dashed var(--local);background:var(--localsoft)"></span>
+                <span style="font:700 18px/1.2 Archivo;letter-spacing:-.02em">{{ so.title }}</span>
+              </div>
+              <div style="font:400 14px/1.5 Archivo;color:var(--ink2)">{{ so.body }}</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                <button onClick="{{ so.primary }}" style="padding:16px 0;border-radius:12px;cursor:pointer;font:600 14.5px/1 Archivo;border:0;background:{{ so.pbg }};color:{{ so.pfg }}">{{ so.plabel }}</button>
+                <button onClick="{{ cancelSignOut }}" style="padding:15px 0;border-radius:12px;cursor:pointer;font:600 14px/1 Archivo;border:1px solid var(--line);background:var(--surf2);color:var(--ink)">Stay signed in</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:14px;right:14px;bottom:96px;z-index:9;padding:13px 15px;border-radius:13px;background:var(--surf2);border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:11px;animation:lmup .2s ease-out">
+            <span style="width:12px;height:12px;flex:none;border-radius:3px;border:1.5px dashed var(--local);background:var(--localsoft)"></span>
+            <span style="font:500 13px/1.4 Archivo;color:var(--ink)">{{ toast }}</span>
+          </div>
+        </sc-if>
+      </div>
+    </x-import>
+  </div>
+
+  <aside style="width:296px;flex:none;display:flex;flex-direction:column;gap:20px;color:#AEB9BE;position:sticky;top:44px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">The point of view</div>
+      <div style="font:600 15px/1.4 Archivo;color:#EDF1F3;letter-spacing:-.01em">Synced is quiet. Unsent is loud.</div>
+      <div style="font:400 12.5px/1.55 Archivo">Most apps celebrate success with colour. Here, colour means the phone still owes the server something. When the screen goes calm and grey, the work has landed. A driver learns that in one shift and never has to read a word again.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Rules I set</div>
+      <div style="font:400 12.5px/1.55 Archivo">The square chip never relies on colour alone — outline style and fill carry the same message, so it survives rain, glare and colour-blindness.</div>
+      <div style="font:400 12.5px/1.55 Archivo">The truth strip under the status bar is on every screen. The app is never allowed to imply something is sent when it isn’t.</div>
+      <div style="font:400 12.5px/1.55 Archivo">Offline is a neutral fact, not an error. Sync-failed is the only red state, because it is the only one the driver might eventually need to act on.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid #262B2F">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Where I diverged</div>
+      <div style="font:400 12.5px/1.55 Archivo">Screen 4 is split in two: <span style="color:#EDF1F3">Outbox</span> (the queue, sync, conflicts) and <span style="color:#EDF1F3">Profile</span> (driver, van, sign-out). Sync is checked mid-shift, settings almost never — putting them together buries the thing that matters.</div>
+      <div style="font:400 12.5px/1.55 Archivo">Conflicts resolve on the order detail, not in a separate screen. The decision needs the address, the items and the history next to it.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid #262B2F">
+      <div style="font:600 10px/1 'JetBrains Mono',monospace;color:#6B787F;letter-spacing:.1em;text-transform:uppercase">Try</div>
+      <div style="font:400 12.5px/1.55 Archivo">Go offline → open a stop → Update status → save. Then Outbox → Sync now and watch the chips settle.</div>
+    </div>
+  </aside>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:980}}">
+const SM = {
+  'Pending':    { fg: 'var(--ink2)', bg: 'var(--surf2)', rail: 'var(--line)' },
+  'Confirmed':  { fg: 'var(--ink)',  bg: 'var(--surf2)', rail: 'var(--ink3)' },
+  'In transit': { fg: 'var(--tr)',   bg: 'var(--trsoft)', rail: 'var(--tr)' },
+  'Delivered':  { fg: 'var(--ok)',   bg: 'var(--oksoft)', rail: 'var(--ok)' },
+  'Failed':     { fg: 'var(--fail)', bg: 'var(--failsoft)', rail: 'var(--fail)' },
+};
+const RANK = { 'Pending': 0, 'Confirmed': 1, 'In transit': 2, 'Failed': 3, 'Delivered': 4 };
+const REASONS = ['Nobody home', 'Refused', 'Access problem', 'Damaged'];
+
+function chip(kind, extra) {
+  if (kind === 'conflict') return { st: 'solid', c: 'var(--conf)', f: 'linear-gradient(135deg,var(--conf) 0 50%,transparent 50% 100%)', an: 'none', l: 'Conflict', lc: 'var(--conf)' };
+  if (kind === 'sending')  return { st: 'solid', c: 'var(--local)', f: 'var(--local)', an: 'lmpulse 1s ease-in-out infinite', l: 'Sending', lc: 'var(--local)' };
+  if (kind === 'failed')   return { st: 'solid', c: 'var(--fail)', f: 'var(--failsoft)', an: 'none', l: extra || 'Retrying', lc: 'var(--fail)' };
+  if (kind === 'local')    return { st: 'dashed', c: 'var(--local)', f: 'var(--localsoft)', an: 'none', l: 'On phone', lc: 'var(--local)' };
+  return { st: 'solid', c: 'var(--ink3)', f: 'var(--ink3)', an: 'none', l: 'On server', lc: 'var(--ink3)' };
+}
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function ago(ms, now) {
+  const s = Math.max(0, Math.round((now - ms) / 1000));
+  if (s < 60) return s + 's ago';
+  const m = Math.round(s / 60);
+  if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60);
+  return h + 'h ' + (m % 60) + 'm ago';
+}
+function clock(mins, now) {
+  const d = new Date(now - mins * 60000);
+  return pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+const RAW = [
+  ['LM-4102', 'Marta Reyes', '12 Alder Street', 'Flat 2, north entrance', '08:00 – 10:00', '', 'Delivered', [['Parcel — small box', 1, 'BX-01']], 'Leave with neighbour if out'],
+  ['LM-4108', 'Ivo Brandt', '4 Kestrel Yard', 'Unit C, behind the gate', '08:30 – 10:30', '', 'Delivered', [['Crate — chilled', 2, 'CR-14'], ['Parcel — envelope', 1, 'EV-02']], ''],
+  ['LM-4114', 'Selma Fournier', '88 Harbour View', 'Apt 3B, buzzer 12', '09:00 – 11:00', 'Buzzer broken — call on arrival', 'Failed', [['Parcel — medium box', 3, 'BX-04']], ''],
+  ['LM-4121', 'Otto Lindqvist', '7 Milton Row', 'Blue door, side of house', '09:30 – 11:30', '', 'In transit', [['Pallet — half', 1, 'PL-08']], ''],
+  ['LM-4126', 'Rani Devarajan', '203 Cedar Wharf', 'Loading bay 2', '10:00 – 12:00', 'Bay closes at noon', 'Confirmed', [['Crate — dry goods', 4, 'CR-02'], ['Parcel — small box', 2, 'BX-01']], ''],
+  ['LM-4133', 'Tomas Ek', '19 Slate Lane', 'Ring twice', '10:30 – 12:30', '', 'Confirmed', [['Parcel — large box', 1, 'BX-09']], ''],
+  ['LM-4139', 'Halima Nasser', 'Bramble Court, 5', 'Ground floor, rear', '11:00 – 13:00', '', 'Confirmed', [['Parcel — envelope', 2, 'EV-02']], ''],
+  ['LM-4144', 'Peder Aas', '61 Quarry Road', 'Farm gate, second track', '11:30 – 13:30', 'No signal here — gate code 4417', 'Pending', [['Crate — feed', 6, 'CR-21']], ''],
+  ['LM-4150', 'Yuki Amano', 'Northgate Studios', 'Studio 14, third floor', '12:00 – 14:00', '', 'Pending', [['Parcel — fragile', 1, 'FR-03']], ''],
+  ['LM-4157', 'Emine Yildiz', '34 Foundry Street', 'Shop front', '12:30 – 14:30', '', 'Pending', [['Crate — dry goods', 3, 'CR-02']], ''],
+  ['LM-4163', 'Gustav Holm', 'Riverside Depot', 'Gate 4, ask for stores', '13:00 – 15:00', '', 'Pending', [['Pallet — full', 2, 'PL-01']], ''],
+  ['LM-4170', 'Amara Diallo', '9 Wexford Close', 'Green bin by the porch', '13:30 – 15:30', 'Leave in porch, do not ring', 'Pending', [['Parcel — small box', 1, 'BX-01']], ''],
+];
+
+function mkOrders() {
+  return RAW.map((r, i) => {
+    const status = r[6];
+    const hist = [{ label: 'Assigned to you', mins: 340 - i * 4, synced: true, detail: '' }];
+    if (RANK[status] >= 1) hist.push({ label: 'Confirmed', mins: 300 - i * 6, synced: true, detail: '' });
+    if (RANK[status] >= 2 && status !== 'Failed') hist.push({ label: 'In transit', mins: 120 - i * 5, synced: true, detail: '' });
+    if (status === 'Delivered') hist.push({ label: 'Delivered', mins: 96 - i * 8, synced: true, detail: 'Signed for by ' + r[1].split(' ')[0] });
+    if (status === 'Failed') hist.push({ label: 'Couldn’t deliver', mins: 41, synced: true, detail: 'Nobody home · card left' });
+    return {
+      id: i + 1, stop: i + 1, no: r[0], name: r[1], addr: r[2], addr2: r[3], win: r[4],
+      notes: r[5], status: status, items: r[7].map(x => ({ n: x[0], q: x[1], sku: x[2] })),
+      notesForCustomer: r[8], conflict: null, hist: hist.reverse(),
+    };
+  });
+}
+
+class Component extends DCLogic {
+  state = (() => {
+    const orders = mkOrders();
+    return {
+      orders, screen: 'route', variant: 'A', filter: 'all', detailId: null,
+      conn: 'online', syncing: false, lastSync: Date.now() - 4 * 60000,
+      queue: [
+        { id: 'q1', oid: 2, label: 'Status → Delivered', since: Date.now() - 9 * 60000, attempts: 0, state: 'queued', fail: false },
+        { id: 'q2', oid: 2, label: 'Photo · 1.4 MB', since: Date.now() - 9 * 60000, attempts: 0, state: 'queued', fail: false },
+        { id: 'q3', oid: 3, label: 'Couldn’t deliver · nobody home', since: Date.now() - 3 * 60000, attempts: 0, state: 'queued', fail: false },
+      ],
+      theme: 'dark', now: Date.now(), loading: false, signOut: false, toast: '',
+      celebrate: false, loadMsg: 'Reaching dispatch…',
+      sheet: { open: false, oid: null, status: null, reason: null, notes: '', recipient: '', photo: false },
+      ack: { open: false, sent: false, status: '' },
+      qn: 4,
+    };
+  })();
+
+  timers = [];
+  componentDidMount() { this.tick = setInterval(() => this.setState({ now: Date.now() }), 5000); }
+  componentWillUnmount() { clearInterval(this.tick); this.timers.forEach(clearTimeout); }
+  later(fn, ms) { const t = setTimeout(fn, ms); this.timers.push(t); return t; }
+  flash(msg) { this.setState({ toast: msg }); this.later(() => this.setState({ toast: '' }), 3200); }
+
+  // ── queue helpers
+  qFor(id) { return this.state.queue.filter(q => q.oid === id); }
+  kindFor(o) {
+    if (o.conflict) return 'conflict';
+    const q = this.qFor(o.id);
+    if (!q.length) return 'synced';
+    if (q.some(x => x.state === 'sending')) return 'sending';
+    if (q.some(x => x.state === 'failed')) return 'failed';
+    return 'local';
+  }
+  chipFor(o) {
+    const k = this.kindFor(o);
+    if (k === 'failed') { const a = Math.max(...this.qFor(o.id).map(x => x.attempts)); return chip('failed', 'Retry ' + a); }
+    return chip(k);
+  }
+
+  // ── nav
+  go(s) { this.setState({ screen: s, toast: '' }); }
+  openOrder(id) { this.setState({ screen: 'detail', detailId: id }); }
+
+  // ── sync
+  syncNow = () => {
+    if (this.state.loading) return;
+    if (this.state.conn === 'offline') { this.flash('No signal. Everything you’ve done is safe on the phone.'); return; }
+    if (this.state.syncing) return;
+    const q = this.state.queue.slice();
+    if (!q.length) { this.setState({ lastSync: Date.now() }); this.flash('Checked — the server already has everything.'); return; }
+    this.setState({ syncing: true });
+    let i = 0;
+    const step = () => {
+      const e = q[i];
+      if (!e) {
+        const left = this.state.queue.length;
+        this.setState({ syncing: false, lastSync: Date.now(), celebrate: left === 0 });
+        if (left === 0) this.later(() => this.setState({ celebrate: false }), 4000);
+        return;
+      }
+      this.setState(s => ({ queue: s.queue.map(x => x.id === e.id ? Object.assign({}, x, { state: 'sending' }) : x) }));
+      this.later(() => {
+        if (e.fail) {
+          this.setState(s => ({ queue: s.queue.map(x => x.id === e.id ? Object.assign({}, x, { state: 'failed', attempts: x.attempts + 1 }) : x) }));
+        } else {
+          this.setState(s => ({
+            queue: s.queue.filter(x => x.id !== e.id),
+            orders: s.orders.map(o => o.id === e.oid ? Object.assign({}, o, { hist: o.hist.map(h => h.qid === e.id ? Object.assign({}, h, { synced: true }) : h) }) : o),
+          }));
+        }
+        i++; this.later(step, 180);
+      }, 620);
+    };
+    this.later(step, 320);
+  };
+
+  toggleConn = () => {
+    const off = this.state.conn === 'online';
+    this.setState({ conn: off ? 'offline' : 'online', syncing: false });
+    if (off) this.flash('Signal lost. Keep working — nothing will be dropped.');
+    else this.later(this.syncNow, 700);
+  };
+
+  // ── status update flow
+  openUpdate = () => {
+    const id = this.state.detailId;
+    this.setState({ sheet: { open: true, oid: id, status: null, reason: null, notes: '', recipient: '', photo: false } });
+  };
+  quickUpdate(id, status) {
+    this.setState({ screen: 'detail', detailId: id, sheet: { open: true, oid: id, status: status, reason: null, notes: '', recipient: '', photo: false } });
+  }
+  closeSheet = () => this.setState({ sheet: Object.assign({}, this.state.sheet, { open: false }) });
+  pick(status) { this.setState({ sheet: Object.assign({}, this.state.sheet, { status: status, reason: status === 'Failed' ? this.state.sheet.reason : null }) }); }
+  pickReason(r) { this.setState({ sheet: Object.assign({}, this.state.sheet, { reason: r }) }); }
+  setNotes = e => this.setState({ sheet: Object.assign({}, this.state.sheet, { notes: e.target.value }) });
+  setRecipient = e => this.setState({ sheet: Object.assign({}, this.state.sheet, { recipient: e.target.value }) });
+  capturePhoto = () => this.setState({ sheet: Object.assign({}, this.state.sheet, { photo: true }) });
+
+  saveUpdate = () => {
+    const sh = this.state.sheet;
+    if (!sh.status) return;
+    const online = this.state.conn === 'online' && !this.state.loading;
+    const qid = 'q' + this.state.qn;
+    const extra = [];
+    if (sh.status === 'Failed' && sh.reason) extra.push(sh.reason);
+    if (sh.recipient) extra.push('Taken by ' + sh.recipient);
+    if (sh.photo) extra.push('1 photo');
+    if (sh.notes) extra.push('“' + sh.notes + '”');
+    const label = sh.status === 'Failed' ? ('Couldn’t deliver' + (sh.reason ? ' · ' + sh.reason.toLowerCase() : '')) : ('Status → ' + sh.status);
+    const entries = [{ id: qid, oid: sh.oid, label: label, since: Date.now(), attempts: 0, state: 'queued', fail: false }];
+    if (sh.photo) entries.push({ id: qid + 'p', oid: sh.oid, label: 'Photo · 1.4 MB', since: Date.now(), attempts: 0, state: 'queued', fail: false });
+    this.setState(s => ({
+      qn: s.qn + 1,
+      queue: s.queue.concat(entries),
+      orders: s.orders.map(o => o.id === sh.oid ? Object.assign({}, o, {
+        status: sh.status,
+        hist: [{ label: sh.status === 'Failed' ? 'Couldn’t deliver' : sh.status, mins: 0, synced: false, qid: qid, detail: extra.join(' · ') }].concat(o.hist),
+      }) : o),
+      sheet: Object.assign({}, s.sheet, { open: false }),
+      ack: { open: true, sent: false, status: sh.status },
+    }));
+    if (online) this.later(this.syncNow, 900);
+  };
+  dismissAck = () => this.setState({ ack: { open: false, sent: false, status: '' }, screen: 'route', detailId: null });
+
+  // ── conflict
+  resolve(which) {
+    const id = this.state.detailId;
+    this.setState(s => ({
+      orders: s.orders.map(o => {
+        if (o.id !== id || !o.conflict) return o;
+        const next = which === 'local' ? o.conflict.localStatus : o.conflict.serverStatus;
+        return Object.assign({}, o, {
+          status: next, conflict: null,
+          hist: [{ label: 'You resolved it → ' + next, mins: 0, synced: false, qid: 'qr' + id, detail: which === 'local' ? 'Kept the version on this phone' : 'Took the server’s version' }].concat(o.hist),
+        });
+      }),
+      queue: s.queue.concat([{ id: 'qr' + id, oid: id, label: 'Conflict resolved', since: Date.now(), attempts: 0, state: 'queued', fail: false }]),
+    }));
+    this.flash('Decision saved on the phone. It goes up with everything else.');
+  }
+
+  // ── sign out
+  askSignOut = () => this.setState({ signOut: true });
+  cancelSignOut = () => this.setState({ signOut: false });
+
+  // ── scenarios
+  scenario(name) {
+    this.timers.forEach(clearTimeout); this.timers = [];
+    const orders = mkOrders();
+    const base = { orders, screen: 'route', detailId: null, filter: 'all', syncing: false, loading: false, celebrate: false, toast: '', signOut: false, sheet: { open: false, oid: null, status: null, reason: null, notes: '', recipient: '', photo: false }, ack: { open: false, sent: false, status: '' }, qn: 20, now: Date.now() };
+    const q = (id, oid, label, mins, attempts, state, fail) => ({ id, oid, label, since: Date.now() - mins * 60000, attempts, state: state || 'queued', fail: !!fail });
+    if (name === 'shift') {
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 4 * 60000, queue: [q('a1', 2, 'Status → Delivered', 9), q('a2', 2, 'Photo · 1.4 MB', 9), q('a3', 3, 'Couldn’t deliver · nobody home', 3)] }));
+    } else if (name === 'offline') {
+      orders[3].status = 'Delivered'; orders[4].status = 'Delivered';
+      this.setState(Object.assign(base, {
+        conn: 'offline', lastSync: Date.now() - 47 * 60000,
+        queue: [q('b1', 2, 'Status → Delivered', 44), q('b2', 2, 'Photo · 1.4 MB', 44), q('b3', 3, 'Couldn’t deliver · access problem', 31), q('b4', 4, 'Status → Delivered', 18), q('b5', 5, 'Status → Delivered', 6), q('b6', 5, 'Photo · 1.1 MB', 6)],
+      }));
+    } else if (name === 'syncing') {
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 12 * 60000, queue: [q('c1', 2, 'Status → Delivered', 12), q('c2', 2, 'Photo · 1.4 MB', 12), q('c3', 3, 'Couldn’t deliver · refused', 8), q('c4', 4, 'Status → In transit', 2)] }));
+      this.later(this.syncNow, 260);
+    } else if (name === 'failed') {
+      this.setState(Object.assign(base, {
+        conn: 'online', lastSync: Date.now() - 21 * 60000,
+        queue: [Object.assign(q('d1', 3, 'Couldn’t deliver · damaged', 21, 3, 'failed', true), { reason: 'The server rejected this: the reason code needs a photo attached. It will keep trying, and dispatch has been told.' }), q('d2', 4, 'Status → Delivered', 5)],
+      }));
+    } else if (name === 'conflict') {
+      orders[3].conflict = { localStatus: 'Delivered', serverStatus: 'Failed', localAt: clock(26, Date.now()), serverAt: clock(22, Date.now()), localNote: 'You marked it delivered, photo attached, taken by O. Lindqvist.', serverNote: 'Dispatch marked it failed after the customer phoned to say nothing arrived.' };
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 2 * 60000, queue: [q('e1', 4, 'Status → Delivered', 26)], screen: 'detail', detailId: 4 }));
+    } else if (name === 'caught') {
+      orders.forEach((o, i) => { if (i < 7) { o.status = 'Delivered'; } });
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 8000, queue: [], screen: 'outbox', celebrate: true }));
+      this.later(() => this.setState({ celebrate: false }), 4500);
+    } else if (name === 'empty') {
+      this.setState(Object.assign(base, { orders: [], conn: 'online', lastSync: Date.now() - 3 * 60000, queue: [] }));
+    } else if (name === 'loading') {
+      this.setState(Object.assign(base, { orders: [], conn: 'online', lastSync: 0, queue: [], loading: true, loadMsg: 'Reaching dispatch…' }));
+      this.later(() => this.setState({ loadMsg: 'Downloading 12 stops…' }), 1300);
+      this.later(() => this.setState({ loadMsg: 'Saving to this phone…' }), 2500);
+      this.later(() => this.setState({ orders: mkOrders(), loading: false, lastSync: Date.now(), queue: [] }), 3500);
+    }
+  }
+
+  renderVals() {
+    const s = this.state, now = s.now, orders = s.orders;
+    const dark = s.theme !== 'light';
+    const pendingOrders = orders.filter(o => this.qFor(o.id).length > 0);
+    const pending = s.queue.length;
+    const failedQ = s.queue.filter(q => q.state === 'failed');
+    const conflicts = orders.filter(o => o.conflict);
+    const done = orders.filter(o => o.status === 'Delivered' || o.status === 'Failed').length;
+    const total = orders.length;
+
+    // truth strip
+    let strip;
+    const dim = 'var(--ink3)', on = 'var(--ink2)';
+    if (s.loading) strip = { bg: 'var(--surf)', line: 'var(--line)', fg: 'var(--ink2)', title: 'Setting up', meta: 'nothing saved on the phone yet', b1: on, b2: on, b3: dim, slash: false, sweep: true, hasAction: false };
+    else if (conflicts.length) strip = { bg: 'var(--confsoft)', line: 'var(--conf)', fg: 'var(--conf)', title: conflicts.length + (conflicts.length === 1 ? ' stop needs your decision' : ' stops need your decision'), meta: 'everything else is synced', b1: on, b2: on, b3: on, slash: false, sweep: false, hasAction: true, actionLabel: 'Review', action: () => this.openOrder(conflicts[0].id) };
+    else if (failedQ.length) strip = { bg: 'var(--failsoft)', line: 'var(--fail)', fg: 'var(--fail)', title: failedQ.length + ' change the server won’t take', meta: 'retrying · attempt ' + (failedQ[0].attempts + 1) + ' next', b1: on, b2: on, b3: on, slash: false, sweep: false, hasAction: true, actionLabel: 'Look', action: () => this.go('outbox') };
+    else if (s.syncing) strip = { bg: 'var(--localsoft)', line: 'var(--local)', fg: 'var(--local)', title: 'Sending ' + pending + (pending === 1 ? ' change' : ' changes'), meta: 'keep driving, this finishes on its own', b1: on, b2: on, b3: on, slash: false, sweep: true, hasAction: false };
+    else if (s.conn === 'offline') strip = { bg: 'var(--surf2)', line: 'var(--line)', fg: 'var(--ink)', title: pending ? 'No signal · ' + pending + ' waiting on this phone' : 'No signal · nothing waiting', meta: 'last reached the server ' + ago(s.lastSync, now), b1: dim, b2: dim, b3: dim, slash: true, sweep: false, hasAction: false };
+    else if (pending) strip = { bg: 'var(--localsoft)', line: 'var(--local)', fg: 'var(--local)', title: pending + (pending === 1 ? ' change on this phone' : ' changes on this phone'), meta: 'oldest waiting ' + ago(Math.min.apply(null, s.queue.map(q => q.since)), now), b1: on, b2: on, b3: on, slash: false, sweep: false, hasAction: true, actionLabel: 'Send', action: this.syncNow };
+    else if (s.celebrate) strip = { bg: 'var(--oksoft)', line: 'var(--ok)', fg: 'var(--ok)', title: 'Everything is on the server', meta: 'confirmed ' + ago(s.lastSync, now), b1: on, b2: on, b3: on, slash: false, sweep: false, hasAction: false };
+    else strip = { bg: 'var(--surf)', line: 'var(--line)', fg: 'var(--ink2)', title: 'Nothing waiting', meta: 'server confirmed ' + ago(s.lastSync, now), b1: on, b2: on, b3: on, slash: false, sweep: false, hasAction: false };
+
+    // filters
+    const counts = { all: total, Pending: 0, Confirmed: 0, 'In transit': 0, Delivered: 0, Failed: 0 };
+    orders.forEach(o => { counts[o.status]++; });
+    const fkeys = [['all', 'All'], ['Pending', 'Pending'], ['Confirmed', 'Confirmed'], ['In transit', 'In transit'], ['Delivered', 'Delivered'], ['Failed', 'Failed']];
+    const filters = fkeys.map(k => {
+      const act = s.filter === k[0];
+      const m = k[0] === 'all' ? { fg: 'var(--ink)', bg: 'var(--surf2)' } : SM[k[0]];
+      return { label: k[1], count: counts[k[0]], on: () => this.setState({ filter: k[0] }),
+        bg: act ? (k[0] === 'all' ? 'var(--ink)' : m.bg) : 'transparent',
+        fg: act ? (k[0] === 'all' ? 'var(--bg)' : m.fg) : 'var(--ink2)',
+        bd: act ? (k[0] === 'all' ? 'var(--ink)' : m.fg) : 'var(--line)' };
+    });
+
+    const filtered = s.filter === 'all' ? orders : orders.filter(o => o.status === s.filter);
+    const disp = o => {
+      const m = SM[o.status], ck = this.kindFor(o), c = this.chipFor(o), dirty = ck === 'local' || ck === 'sending' || ck === 'failed';
+      return {
+        id: o.id, no: o.no, name: o.name, stopPad: pad(o.stop), addr: o.addr, win: o.win, status: o.status,
+        itemsLabel: o.items.reduce((a, b) => a + b.q, 0) + (o.items.reduce((a, b) => a + b.q, 0) === 1 ? ' item' : ' items'),
+        stFg: m.fg, stBg: m.bg, rail: dirty ? 'var(--local)' : m.rail, chip: c, hasConflict: !!o.conflict,
+        rowBg: dirty ? 'var(--localsoft)' : 'transparent',
+        cardBg: dirty ? 'var(--localsoft)' : 'var(--surf)', cardSt: dirty ? 'dashed' : 'solid',
+        cardBd: dirty ? 'var(--local)' : 'var(--line)', cardOp: o.status === 'Delivered' && !dirty ? '.62' : '1',
+        gutterFg: dirty ? 'var(--local)' : 'var(--ink3)',
+        open: () => this.openOrder(o.id),
+      };
+    };
+    const visible = filtered.map(disp);
+    const nextIdx = filtered.findIndex(o => o.status !== 'Delivered' && o.status !== 'Failed');
+    const heroOrder = nextIdx >= 0 ? filtered[nextIdx] : null;
+    const hero = heroOrder ? Object.assign(disp(heroOrder), {
+      quickDelivered: () => this.quickUpdate(heroOrder.id, 'Delivered'),
+      quickFailed: () => this.quickUpdate(heroOrder.id, 'Failed'),
+    }) : {};
+    const rest = filtered.filter((o, i) => i !== nextIdx).map(disp);
+
+    // detail
+    const dO = orders.find(o => o.id === s.detailId);
+    let det = {};
+    if (dO) {
+      const m = SM[dO.status];
+      det = {
+        no: dO.no, name: dO.name, stopPad: pad(dO.stop), status: dO.status, stFg: m.fg, stBg: m.bg,
+        chip: this.chipFor(dO), addr: dO.addr, addr2: dO.addr2, win: dO.win, phone: '+1 555 0' + (140 + dO.id),
+        hasNotes: !!dO.notes, notes: dO.notes, items: dO.items,
+        itemsLabel: (() => { const u = dO.items.reduce((a, b) => a + b.q, 0), l = dO.items.length; return u + (u === 1 ? ' unit · ' : ' units · ') + l + (l === 1 ? ' line' : ' lines'); })(),
+        hasConflict: !!dO.conflict, cf: dO.conflict || {},
+        hist: dO.hist.map(h => ({
+          label: h.label, at: h.mins === 0 ? 'just now' : clock(h.mins, now),
+          chip: chip(h.synced ? 'synced' : (s.syncing ? 'sending' : (s.conn === 'offline' ? 'local' : 'local'))),
+          syncLabel: h.synced ? 'on the server' : (s.conn === 'offline' ? 'on this phone — no signal to send it' : 'on this phone — waiting to send'),
+          hasDetail: !!h.detail, detail: h.detail,
+        })),
+      };
+    }
+
+    // outbox
+    const ob = {
+      headline: pending ? pending + (pending === 1 ? ' change waiting' : ' changes waiting') : 'Nothing waiting',
+      sub: pending ? 'These are saved on the phone. They go to the server in the order you made them.' : 'Your phone and the server agree on everything.',
+      cardBg: s.conn === 'offline' ? 'var(--surf2)' : (failedQ.length ? 'var(--failsoft)' : (pending ? 'var(--localsoft)' : 'var(--surf)')),
+      cardBd: s.conn === 'offline' ? 'var(--line)' : (failedQ.length ? 'var(--fail)' : (pending ? 'var(--local)' : 'var(--line)')),
+      connTitle: s.syncing ? 'Sending now' : (s.conn === 'offline' ? 'No signal' : (failedQ.length ? 'Connected — one change rejected' : 'Connected')),
+      connFg: s.conn === 'offline' ? 'var(--ink)' : (failedQ.length ? 'var(--fail)' : (s.syncing ? 'var(--local)' : 'var(--ink)')),
+      lastSync: s.lastSync ? ago(s.lastSync, now) : 'never on this device',
+      btnLabel: s.syncing ? 'Sending…' : (s.conn === 'offline' ? 'Try anyway' : (pending ? 'Send ' + pending + ' now' : 'Check for changes')),
+      btnBg: s.conn === 'offline' || s.syncing ? 'var(--surf)' : 'var(--ink)',
+      btnFg: s.conn === 'offline' || s.syncing ? 'var(--ink2)' : 'var(--bg)',
+      btnBd: s.conn === 'offline' || s.syncing ? 'var(--line)' : 'var(--ink)',
+      hasConflicts: conflicts.length > 0,
+      conflictTitle: conflicts.length + (conflicts.length === 1 ? ' stop needs a decision' : ' stops need a decision'),
+      openConflict: () => conflicts.length && this.openOrder(conflicts[0].id),
+      hasQueue: pending > 0, queueCount: pending, caughtUp: pending === 0 && !conflicts.length,
+      caughtMeta: 'Photos cleared from the phone. ' + done + ' of ' + total + ' stops done.',
+      queue: s.queue.map(q => {
+        const o = orders.find(x => x.id === q.oid) || { no: '—', name: '—' };
+        const c = q.state === 'sending' ? chip('sending') : (q.state === 'failed' ? chip('failed', 'Retry ' + q.attempts) : chip('local'));
+        return { label: q.label, no: o.no, name: o.name, waited: ago(q.since, now).replace(' ago', ''), chip: c,
+          attempts: q.state === 'failed' ? q.attempts + ' failed attempts' : (q.state === 'sending' ? 'sending' : 'waiting'),
+          bd: q.state === 'failed' ? 'var(--fail)' : 'var(--line)', hasReason: !!q.reason, reason: q.reason || '' };
+      }),
+    };
+
+    // sheet
+    const sh = s.sheet, shO = orders.find(o => o.id === sh.oid) || {};
+    const opts = [
+      ['Delivered', 'Handed over, left safe, or signed for'],
+      ['Failed', 'Couldn’t complete this stop'],
+      ['In transit', 'On the way — not there yet'],
+      ['Confirmed', 'Seen it, haven’t started'],
+    ];
+    const sheet = {
+      open: sh.open, name: shO.name || '', no: shO.no || '', stopPad: pad(shO.stop || 0),
+      choices: opts.map(o => {
+        const act = sh.status === o[0], m = SM[o[0]];
+        return { label: o[0], hint: o[1], on: () => this.pick(o[0]),
+          bd: act ? m.fg : 'var(--line)', bg: act ? m.bg : 'var(--surf)', fg: act ? m.fg : 'var(--ink)',
+          dot: act ? m.fg : 'var(--line)', dotFill: act ? m.fg : 'transparent' };
+      }),
+      needReason: sh.status === 'Failed',
+      reasons: REASONS.map(r => {
+        const act = sh.reason === r;
+        return { label: r, on: () => this.pickReason(r), bd: act ? 'var(--fail)' : 'var(--line)', bg: act ? 'var(--failsoft)' : 'var(--surf)', fg: act ? 'var(--fail)' : 'var(--ink)' };
+      }),
+      notes: sh.notes, recipient: sh.recipient,
+      needProof: sh.status === 'Delivered' || sh.status === 'Failed',
+      hasPhoto: sh.photo, noPhoto: !sh.photo,
+      saveLabel: sh.status ? (sh.status === 'Failed' ? 'Save — couldn’t deliver' : 'Save — ' + sh.status.toLowerCase()) : 'Pick what happened',
+      saveBg: sh.status ? 'var(--ink)' : 'var(--surf2)', saveFg: sh.status ? 'var(--bg)' : 'var(--ink3)', saveOp: sh.status ? '1' : '.6',
+      hint: s.conn === 'offline' ? 'No signal here. This saves on the phone and sends itself later.' : 'Saves on the phone first, then goes to the server.',
+      hintChip: chip('local'),
+    };
+
+    const ackSent = s.conn === 'online';
+    const ack = {
+      open: s.ack.open, chip: chip('local'), tick: 'var(--local)',
+      title: 'Saved on your phone',
+      body: ackSent ? 'It’s written down where nothing can lose it. We’re sending it to the server now — you don’t have to wait.' : 'No signal here, so it stays with you. The moment you have a bar, it goes up on its own.',
+      meta: shO.no ? shO.no + ' · ' + (s.ack.status === 'Failed' ? 'couldn’t deliver' : (s.ack.status || '').toLowerCase()) : '',
+    };
+
+    const so = pending > 0
+      ? { title: 'You have ' + pending + ' unsent ' + (pending === 1 ? 'change' : 'changes'), body: 'Signing out clears this phone. Work that hasn’t reached the server would be lost — including any photos. Stay on and it will send itself as soon as you have signal.', plabel: 'Sign out anyway — lose ' + pending, pbg: 'var(--fail)', pfg: 'var(--bg)', primary: () => { this.setState({ signOut: false }); this.flash('Held back. Nothing was deleted.'); } }
+      : { title: 'Sign out?', body: 'Everything you’ve done today is on the server. Nothing will be lost.', plabel: 'Sign out', pbg: 'var(--ink)', pfg: 'var(--bg)', primary: () => { this.setState({ signOut: false }); this.flash('Signed out (prototype stays put).'); } };
+
+    const mkBtn = (act, activeBg) => ({ bg: act ? activeBg : '#1D2225', bd: act ? activeBg : '#2C3236', fg: act ? '#0B0E10' : '#C6CFD4' });
+    const variants = [
+      ['A', 'Docket', 'Dense list, status rail, sync mark on every row.'],
+      ['B', 'Ledger', 'Route sheet with a stop gutter; unsent stops sit outside the ink.'],
+      ['C', 'Next stop', 'One job at the top with inline actions; the rest collapses.'],
+    ].map(v => Object.assign({ id: v[0], label: v[1], desc: v[2], on: () => this.setState({ variant: v[0] }), idc: s.variant === v[0] ? '#0B0E10' : '#FFB020', dim: s.variant === v[0] ? 'rgba(11,14,16,.62)' : '#8B979D' }, mkBtn(s.variant === v[0], '#E8EDEF')));
+    const scen = [['shift', 'Mid-shift'], ['offline', 'Offline'], ['syncing', 'Syncing'], ['failed', 'Sync failed'], ['conflict', 'Conflict'], ['caught', 'All caught up'], ['empty', 'No route'], ['loading', 'Cold start']]
+      .map(x => Object.assign({ label: x[1], on: () => this.scenario(x[0]) }, mkBtn(false, '#E8EDEF')));
+    const themes = [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(t => {
+      const act = s.theme === t[0];
+      return Object.assign({ label: t[1], on: () => this.setState({ theme: t[0] }),
+        pbd: act ? 'var(--ink)' : 'var(--line)', pbg: act ? 'var(--ink)' : 'var(--surf2)', pfg: act ? 'var(--bg)' : 'var(--ink)' }, mkBtn(act, '#E8EDEF'));
+    });
+
+    return {
+      tm: dark ? 'dark' : 'light', isDark: dark, total: total,
+      onRoute: s.screen === 'route', onDetail: s.screen === 'detail' && !!dO, onOutbox: s.screen === 'outbox', onProfile: s.screen === 'profile',
+      routeA: s.variant === 'A', routeB: s.variant === 'B', routeC: s.variant === 'C',
+      strip: strip, filters: filters, visible: visible, hero: hero, hasHero: !!heroOrder, rest: rest, restCount: rest.length,
+      prog: {
+        headline: total ? done + ' of ' + total + ' done' : 'No stops',
+        sub: total ? (pendingOrders.length ? pendingOrders.length + ' not yet on\nthe server' : 'all confirmed by\nthe server') : '',
+        segs: orders.map(o => {
+          const dirty = this.qFor(o.id).length > 0, fin = o.status === 'Delivered' || o.status === 'Failed';
+          if (dirty) return { bg: 'var(--localsoft)', st: 'dashed', bd: 'var(--local)' };
+          if (fin) return { bg: 'var(--ink2)', st: 'solid', bd: 'var(--ink2)' };
+          return { bg: 'transparent', st: 'solid', bd: 'var(--line)' };
+        }),
+      },
+      emptyRoute: total === 0 && !s.loading,
+      emptyFilter: total > 0 && filtered.length === 0,
+      emptyFilterTitle: s.filter === 'Failed' ? 'No failed stops' : 'Nothing ' + String(s.filter).toLowerCase() + ' right now',
+      emptyFilterBody: s.filter === 'Failed' ? 'Everything you’ve attempted today went through. You still have ' + counts.Pending + ' stops ahead.' : 'This is a filter, not a problem — your ' + total + ' stops are all still here.',
+      clearFilter: () => this.setState({ filter: 'all' }),
+      lastCheck: s.lastSync ? ago(s.lastSync, now) : 'just now',
+      det: det, ob: ob, sheet: sheet, ack: ack, so: so, signOut: s.signOut,
+      showUpdateCta: s.screen === 'detail' && !!dO && !dO.conflict && !sh.open && !s.ack.open,
+      openUpdate: this.openUpdate, closeSheet: this.closeSheet, saveUpdate: this.saveUpdate, dismissAck: this.dismissAck,
+      setNotes: this.setNotes, setRecipient: this.setRecipient, capturePhoto: this.capturePhoto,
+      keepMine: () => this.resolve('local'), keepServer: () => this.resolve('server'),
+      back: () => this.go('route'), goRoute: () => this.go('route'), goOutbox: () => this.go('outbox'), goProfile: () => this.go('profile'),
+      syncNow: this.syncNow, toggleConn: this.toggleConn, askSignOut: this.askSignOut, cancelSignOut: this.cancelSignOut, noop: () => {},
+      tabs: { route: s.screen === 'route' || s.screen === 'detail' ? 'var(--ink)' : 'var(--ink3)', outbox: s.screen === 'outbox' ? 'var(--ink)' : 'var(--ink3)', profile: s.screen === 'profile' ? 'var(--ink)' : 'var(--ink3)' },
+      hasPending: pending > 0 || conflicts.length > 0,
+      badge: conflicts.length ? { bg: 'var(--conf)', fg: 'var(--bg)', n: '!' } : (failedQ.length ? { bg: 'var(--fail)', fg: 'var(--bg)', n: String(pending) } : { bg: 'var(--local)', fg: 'var(--bg)', n: String(pending) }),
+      syncing: s.syncing, loading: s.loading, loadMsg: s.loadMsg,
+      skeleton: [0, 1, 2, 3, 4].map(i => ({ op: String(1 - i * 0.16), d: (i * 0.12) + 's' })),
+      hasToast: !!s.toast, toast: s.toast,
+      themeNote: s.theme === 'auto' ? 'Following the phone. Dark after sunset, so the cab stays dark.' : (s.theme === 'dark' ? 'Locked dark. Easier at night and on battery.' : 'Locked light. Best in direct sun.'),
+      storage: { used: '82 MB', detail: '3 photos · 12 stops · 4 unsent changes', pct: '34%' },
+      variants: variants, scenarios: scen, themes: themes,
+      connBtn: s.conn === 'online' ? { label: 'Signal: on — tap to drop it', bg: '#1D2225', bd: '#2C3236', fg: '#C6CFD4' } : { label: 'Signal: off — tap to restore', bg: '#3A2A0B', bd: '#FFB020', fg: '#FFB020' },
+      legend: [
+        Object.assign({ t: 'On phone', d: 'Saved here. The server doesn’t have it.' }, chip('local')),
+        Object.assign({ t: 'Sending', d: 'Going up right now.' }, chip('sending')),
+        Object.assign({ t: 'Retrying', d: 'Server refused it. It will try again.' }, chip('failed')),
+        Object.assign({ t: 'Conflict', d: 'Two versions. You decide.' }, chip('conflict')),
+        Object.assign({ t: 'On server', d: 'Confirmed. You can forget it.' }, chip('synced')),
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

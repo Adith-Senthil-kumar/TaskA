@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<style>
+:root{--bg:#F2F2F7;--card:#FFFFFF;--fill:#F2F2F7;--fill2:#E9E9EE;--sep:rgba(60,60,67,.14);--ink:#0B0B0C;--ink2:rgba(60,60,67,.60);--ink3:rgba(60,60,67,.34);--tint:#007AFF;--tintsoft:rgba(0,122,255,.10);--or:#E8850C;--orsoft:rgba(255,149,0,.12);--red:#FF3B30;--redsoft:rgba(255,59,48,.10);--grn:#34C759;--grnsoft:rgba(52,199,89,.13);--pur:#AF52DE;--pursoft:rgba(175,82,222,.11);--ind:#5856D6;--indsoft:rgba(88,86,214,.10);--gray:#8E8E93;--bar:rgba(255,255,255,.94);--scrim:rgba(0,0,0,.35)}
+[data-tm="dark"]{--bg:#000000;--card:#1C1C1E;--fill:#2C2C2E;--fill2:#3A3A3C;--sep:rgba(84,84,88,.62);--ink:#FFFFFF;--ink2:rgba(235,235,245,.62);--ink3:rgba(235,235,245,.32);--tint:#0A84FF;--tintsoft:rgba(10,132,255,.16);--or:#FF9F0A;--orsoft:rgba(255,159,10,.16);--red:#FF453A;--redsoft:rgba(255,69,58,.16);--grn:#30D158;--grnsoft:rgba(48,209,88,.16);--pur:#BF5AF2;--pursoft:rgba(191,90,242,.16);--ind:#5E5CE6;--indsoft:rgba(94,92,230,.16);--gray:#8E8E93;--bar:rgba(22,22,24,.94);--scrim:rgba(0,0,0,.55)}
+body{margin:0;background:#E4E4E9;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#007AFF;text-decoration:none}a:hover{text-decoration:underline}
+button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+input,textarea{font-family:inherit}
+@keyframes lmpulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes lmspin{to{transform:rotate(360deg)}}
+@keyframes lmup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes lmsheet{from{transform:translateY(101%)}to{transform:none}}
+@keyframes lmpop{0%{transform:scale(.55);opacity:0}62%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes lmshim{0%{opacity:.4}50%{opacity:.85}100%{opacity:.4}}
+@keyframes lmfade{from{opacity:0}to{opacity:1}}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+
+<div style="display:flex;align-items:flex-start;gap:32px;padding:44px 48px 64px;min-height:100vh;box-sizing:border-box">
+
+  <aside style="width:250px;flex:none;display:flex;flex-direction:column;gap:14px;position:sticky;top:44px">
+    <div style="display:flex;flex-direction:column;gap:4px;padding:0 2px">
+      <div style="font:700 19px/1 -apple-system,sans-serif;color:#1C1C1E;letter-spacing:-.02em">Lastmile</div>
+      <div style="font:500 11px/1.4 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.04em;text-transform:uppercase">Driver app · take two</div>
+    </div>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">States</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ scenarios }}" as="s" hint-placeholder-count="8">
+          <button onClick="{{ s.on }}" style="padding:8px 11px;border-radius:8px;cursor:pointer;font:500 12px/1 -apple-system,sans-serif;border:1px solid rgba(0,0,0,.09);background:#F5F5F7;color:#1C1C1E">{{ s.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">Appearance</div>
+      <div style="display:flex;gap:6px">
+        <sc-for list="{{ themes }}" as="t" hint-placeholder-count="3">
+          <button onClick="{{ t.on }}" style="flex:1;padding:8px 0;border-radius:8px;cursor:pointer;font:600 12px/1 -apple-system,sans-serif;border:1px solid {{ t.bd }};background:{{ t.bg }};color:{{ t.fg }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ toggleConn }}" style="padding:9px 11px;border-radius:8px;cursor:pointer;text-align:left;font:600 12px/1 -apple-system,sans-serif;border:1px solid {{ connBtn.bd }};background:{{ connBtn.bg }};color:{{ connBtn.fg }}">{{ connBtn.label }}</button>
+    </div>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">Sync language</div>
+      <sc-for list="{{ legend }}" as="l" hint-placeholder-count="5">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          <span style="width:18px;height:18px;flex:none;border-radius:9px;background:{{ l.bg }};color:{{ l.fg }};display:flex;align-items:center;justify-content:center;font:700 10px/1 -apple-system,sans-serif">{{ l.g }}</span>
+          <span style="display:flex;flex-direction:column;gap:1px"><span style="font:600 12px/1.2 -apple-system,sans-serif;color:#1C1C1E">{{ l.t }}</span><span style="font:400 11px/1.35 -apple-system,sans-serif;color:#8E8E93">{{ l.d }}</span></span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding:2px 4px;font:400 11.5px/1.5 -apple-system,sans-serif;color:#8E8E93">Try: go offline → open a stop → update its status → save. Then Outbox → Sync now.</div>
+  </aside>
+
+  <div style="flex:none">
+    <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ isDark }}" hint-size="402px,874px">
+      <div data-tm="{{ tm }}" style="position:relative;height:874px;overflow:hidden;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif">
+
+        <div style="height:58px;flex:none"></div>
+
+        <div style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain">
+
+          <sc-if value="{{ onRoute }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:6px 16px 8px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font:700 34px/1.1 -apple-system,sans-serif;letter-spacing:-.022em">Route</div>
+                <div style="text-align:right;display:flex;flex-direction:column;gap:2px">
+                  <span style="font:600 13px/1.2 -apple-system,sans-serif;color:var(--ink)">{{ prog.frac }}</span>
+                  <span style="font:400 11.5px/1.2 -apple-system,sans-serif;color:var(--ink2)">stops done</span>
+                </div>
+              </div>
+              <div style="height:5px;border-radius:3px;background:var(--fill2);overflow:hidden;display:flex">
+                <span style="width:{{ prog.pct }};background:var(--grn);border-radius:3px;transition:width .4s ease"></span>
+              </div>
+
+              <button onClick="{{ strip.action }}" style="display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;text-align:left;cursor:pointer;border:0;background:{{ strip.bg }};animation:{{ strip.an }}">
+                <span style="width:26px;height:26px;flex:none;border-radius:13px;background:{{ strip.iconBg }};color:{{ strip.iconFg }};display:flex;align-items:center;justify-content:center">
+                  <sc-if value="{{ strip.spin }}" hint-placeholder-val="{{ false }}"><span style="width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:lmspin .7s linear infinite"></span></sc-if>
+                  <sc-if value="{{ strip.arrow }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  <sc-if value="{{ strip.check }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4 5 8.9 9.5 3.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                  <sc-if value="{{ strip.bang }}" hint-placeholder-val="{{ false }}"><span style="font:700 13px/1 -apple-system,sans-serif">!</span></sc-if>
+                  <sc-if value="{{ strip.slash }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.2a6 6 0 0 1 9 0M4 8.4a3.2 3.2 0 0 1 5 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="6.5" cy="10.6" r="1" fill="currentColor"/><path d="M1.5 1.5l10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></sc-if>
+                </span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+                  <span style="font:600 14px/1.25 -apple-system,sans-serif;color:{{ strip.fg }}">{{ strip.title }}</span>
+                  <span style="font:400 12px/1.25 -apple-system,sans-serif;color:var(--ink2)">{{ strip.meta }}</span>
+                </span>
+                <sc-if value="{{ strip.hasAction }}" hint-placeholder-val="{{ false }}">
+                  <span style="flex:none;font:600 13.5px/1 -apple-system,sans-serif;color:var(--tint)">{{ strip.actionLabel }}</span>
+                </sc-if>
+              </button>
+
+              <div style="display:flex;gap:7px;overflow-x:auto;margin:0 -16px;padding:2px 16px 4px">
+                <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
+                  <button onClick="{{ f.on }}" style="flex:none;display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:18px;cursor:pointer;border:1px solid {{ f.bd }};background:{{ f.bg }};color:{{ f.fg }}">
+                    <span style="font:600 13px/1 -apple-system,sans-serif">{{ f.label }}</span>
+                    <span style="font:500 12px/1 -apple-system,sans-serif;opacity:.6;font-variant-numeric:tabular-nums">{{ f.count }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <sc-if value="{{ emptyRoute }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:52px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+                <div style="width:58px;height:58px;border-radius:29px;background:var(--fill);display:flex;align-items:center;justify-content:center">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="var(--gray)" stroke-width="1.7"/><circle cx="18" cy="18" r="2.4" stroke="var(--gray)" stroke-width="1.7"/><path d="M6 8.4v3.9a3 3 0 0 0 3 3h6a3 3 0 0 1 3 3" stroke="var(--gray)" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="1 3.4"/></svg>
+                </div>
+                <div style="font:600 18px/1.25 -apple-system,sans-serif;letter-spacing:-.015em">No route yet</div>
+                <div style="font:400 14px/1.45 -apple-system,sans-serif;color:var(--ink2);max-width:256px">Dispatch hasn’t assigned your stops. They’ll appear here on their own — checked {{ lastCheck }}.</div>
+                <button onClick="{{ syncNow }}" style="margin-top:6px;padding:11px 18px;border-radius:20px;cursor:pointer;font:600 14px/1 -apple-system,sans-serif;border:0;background:var(--tintsoft);color:var(--tint)">Check again</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ emptyFilter }}" hint-placeholder-val="{{ false }}">
+              <div style="margin:8px 16px;padding:26px 20px;border-radius:14px;background:var(--card);display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">
+                <div style="font:600 16px/1.3 -apple-system,sans-serif;letter-spacing:-.01em">{{ emptyFilterTitle }}</div>
+                <div style="font:400 13.5px/1.45 -apple-system,sans-serif;color:var(--ink2);max-width:240px">{{ emptyFilterBody }}</div>
+                <button onClick="{{ clearFilter }}" style="margin-top:4px;padding:9px 15px;border-radius:18px;cursor:pointer;font:600 13px/1 -apple-system,sans-serif;border:0;background:var(--tintsoft);color:var(--tint)">Show all {{ total }} stops</button>
+              </div>
+            </sc-if>
+
+            <div style="margin:4px 16px 16px;border-radius:14px;background:var(--card);overflow:hidden">
+              <sc-for list="{{ visible }}" as="o" hint-placeholder-count="7">
+                <button onClick="{{ o.open }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px 13px 16px;cursor:pointer;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--sep)">
+                  <span style="flex:none;width:34px;height:34px;border-radius:17px;background:{{ o.numBg }};color:{{ o.numFg }};display:flex;align-items:center;justify-content:center;font:600 14px/1 -apple-system,sans-serif;font-variant-numeric:tabular-nums">{{ o.stop }}</span>
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                    <span style="display:flex;align-items:baseline;gap:7px">
+                      <span style="font:600 16px/1.25 -apple-system,sans-serif;letter-spacing:-.01em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.name }}</span>
+                      <span style="flex:none;font:400 11.5px/1 -apple-system,sans-serif;color:var(--ink3);font-variant-numeric:tabular-nums">{{ o.no }}</span>
+                    </span>
+                    <span style="font:400 13.5px/1.3 -apple-system,sans-serif;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ o.addr }}</span>
+                    <span style="display:flex;align-items:center;gap:6px;margin-top:1px;white-space:nowrap;overflow:hidden">
+                      <span style="width:7px;height:7px;flex:none;border-radius:4px;background:{{ o.stDot }}"></span>
+                      <span style="font:500 12px/1 -apple-system,sans-serif;color:{{ o.stFg }}">{{ o.status }}</span>
+                      <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3);overflow:hidden;text-overflow:ellipsis">· {{ o.itemsLabel }} · {{ o.win }}</span>
+                    </span>
+                  </span>
+                  <span style="flex:none;display:flex;align-items:center;gap:8px">
+                    <sc-if value="{{ o.showBadge }}" hint-placeholder-val="{{ false }}">
+                      <span style="display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:13px;background:{{ o.bBg }};color:{{ o.bFg }};animation:{{ o.bAn }}">
+                        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span style="font:600 11px/1 -apple-system,sans-serif">{{ o.bLabel }}</span>
+                      </span>
+                    </sc-if>
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="var(--ink3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="animation:lmfade .15s ease-out;padding-bottom:110px">
+              <div style="display:flex;align-items:center;padding:8px 8px 4px">
+                <button onClick="{{ back }}" style="display:flex;align-items:center;gap:4px;padding:8px 10px;border-radius:9px;cursor:pointer;border:0;background:transparent;color:var(--tint);font:400 16px/1 -apple-system,sans-serif">
+                  <svg width="10" height="17" viewBox="0 0 10 17" fill="none"><path d="M9 1 2 8.5 9 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Route
+                </button>
+              </div>
+              <div style="padding:6px 16px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:baseline;gap:9px">
+                  <span style="font:700 28px/1.12 -apple-system,sans-serif;letter-spacing:-.02em">{{ det.name }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:15px;background:{{ det.stBg }}">
+                    <span style="width:7px;height:7px;border-radius:4px;background:{{ det.stDot }}"></span>
+                    <span style="font:600 12.5px/1 -apple-system,sans-serif;color:{{ det.stFg }}">{{ det.status }}</span>
+                  </span>
+                  <span style="display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:15px;background:{{ det.sBg }};color:{{ det.sFg }};animation:{{ det.sAn }}">
+                    <span style="font:600 12.5px/1 -apple-system,sans-serif">{{ det.sLabel }}</span>
+                  </span>
+                  <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap">{{ det.no }} · stop {{ det.stop }} of {{ total }}</span>
+                </div>
+              </div>
+
+              <sc-if value="{{ det.hasConflict }}" hint-placeholder-val="{{ false }}">
+                <div style="margin:0 16px 18px;border-radius:14px;background:var(--card);overflow:hidden;box-shadow:0 0 0 1.5px var(--pur)">
+                  <div style="padding:14px 15px 12px;display:flex;flex-direction:column;gap:5px;background:var(--pursoft)">
+                    <div style="font:600 15px/1.25 -apple-system,sans-serif;color:var(--pur)">Two versions of this stop</div>
+                    <div style="font:400 13px/1.45 -apple-system,sans-serif;color:var(--ink2)">Your phone and the server disagree, and this one can’t be settled automatically.</div>
+                  </div>
+                  <div style="padding:13px 15px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--sep)">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline">
+                      <span style="font:600 11px/1 -apple-system,sans-serif;color:var(--or);letter-spacing:.05em;text-transform:uppercase">On your phone</span>
+                      <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3);font-variant-numeric:tabular-nums">{{ det.cf.localAt }}</span>
+                    </div>
+                    <div style="font:600 16px/1.25 -apple-system,sans-serif">{{ det.cf.localStatus }}</div>
+                    <div style="font:400 13px/1.4 -apple-system,sans-serif;color:var(--ink2)">{{ det.cf.localNote }}</div>
+                  </div>
+                  <div style="padding:13px 15px;display:flex;flex-direction:column;gap:4px">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline">
+                      <span style="font:600 11px/1 -apple-system,sans-serif;color:var(--tint);letter-spacing:.05em;text-transform:uppercase">On the server</span>
+                      <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3);font-variant-numeric:tabular-nums">{{ det.cf.serverAt }}</span>
+                    </div>
+                    <div style="font:600 16px/1.25 -apple-system,sans-serif">{{ det.cf.serverStatus }}</div>
+                    <div style="font:400 13px/1.4 -apple-system,sans-serif;color:var(--ink2)">{{ det.cf.serverNote }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:6px 15px 15px">
+                    <button onClick="{{ keepMine }}" style="padding:14px 0;border-radius:12px;cursor:pointer;font:600 15px/1 -apple-system,sans-serif;border:0;background:var(--pur);color:#fff">Keep mine — {{ det.cf.localStatus }}</button>
+                    <button onClick="{{ keepServer }}" style="padding:13px 0;border-radius:12px;cursor:pointer;font:600 14px/1 -apple-system,sans-serif;border:0;background:var(--fill);color:var(--ink)">Use the server’s — {{ det.cf.serverStatus }}</button>
+                    <div style="font:400 12px/1.4 -apple-system,sans-serif;color:var(--ink3);text-align:center">Your choice is recorded as a decision, with your name on it.</div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="margin:0 16px 18px;border-radius:14px;background:var(--card);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--sep)">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 12px/1.2 -apple-system,sans-serif;color:var(--ink2)">Address</div>
+                    <div style="font:500 15px/1.35 -apple-system,sans-serif">{{ det.addr }}</div>
+                    <div style="font:400 13.5px/1.35 -apple-system,sans-serif;color:var(--ink2)">{{ det.addr2 }}</div>
+                  </div>
+                  <button onClick="{{ noop }}" style="flex:none;width:42px;height:42px;border-radius:21px;cursor:pointer;border:0;background:var(--tintsoft);color:var(--tint);display:flex;align-items:center;justify-content:center">
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 18s6.5-5.2 6.5-10a6.5 6.5 0 1 0-13 0C3.5 12.8 10 18 10 18Z" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
+                  </button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--sep)">
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 12px/1.2 -apple-system,sans-serif;color:var(--ink2)">Window · Phone</div>
+                    <div style="font:500 15px/1.35 -apple-system,sans-serif;font-variant-numeric:tabular-nums">{{ det.win }} · {{ det.phone }}</div>
+                  </div>
+                  <button onClick="{{ noop }}" style="flex:none;width:42px;height:42px;border-radius:21px;cursor:pointer;border:0;background:var(--grnsoft);color:var(--grn);display:flex;align-items:center;justify-content:center">
+                    <svg width="17" height="17" viewBox="0 0 20 20" fill="none"><path d="M6.2 3h-2A1.2 1.2 0 0 0 3 4.2C3 10.7 9.3 17 15.8 17A1.2 1.2 0 0 0 17 15.8v-2a1 1 0 0 0-.8-1l-2.6-.5a1 1 0 0 0-1 .4l-.7 1a11 11 0 0 1-4.1-4.1l1-.7a1 1 0 0 0 .4-1L8.7 4a1 1 0 0 0-1-.9Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+                <sc-if value="{{ det.hasNotes }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:12px 15px;display:flex;flex-direction:column;gap:3px;background:var(--fill)">
+                    <div style="font:400 12px/1.2 -apple-system,sans-serif;color:var(--ink2)">Note from customer</div>
+                    <div style="font:400 14.5px/1.4 -apple-system,sans-serif">“{{ det.notes }}”</div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="margin:0 16px 18px;display:flex;flex-direction:column;gap:7px">
+                <div style="padding:0 15px;font:400 13px/1 -apple-system,sans-serif;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em;font-size:12px">Items · {{ det.itemsLabel }}</div>
+                <div style="border-radius:14px;background:var(--card);overflow:hidden">
+                  <sc-for list="{{ det.items }}" as="it" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--sep)">
+                      <span style="flex:none;min-width:32px;padding:5px 8px;border-radius:8px;background:var(--fill);font:600 13px/1 -apple-system,sans-serif;text-align:center;font-variant-numeric:tabular-nums">×{{ it.q }}</span>
+                      <span style="flex:1;font:400 15px/1.35 -apple-system,sans-serif">{{ it.n }}</span>
+                      <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3)">{{ it.sku }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="margin:0 16px;display:flex;flex-direction:column;gap:7px">
+                <div style="padding:0 15px;font:400 12px/1 -apple-system,sans-serif;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em">History</div>
+                <div style="border-radius:14px;background:var(--card);overflow:hidden">
+                  <sc-for list="{{ det.hist }}" as="h" hint-placeholder-count="3">
+                    <div style="display:flex;gap:11px;padding:12px 15px;border-bottom:1px solid var(--sep)">
+                      <span style="margin-top:4px;width:9px;height:9px;flex:none;border-radius:5px;background:{{ h.dot }};animation:{{ h.an }}"></span>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                        <span style="display:flex;align-items:baseline;gap:8px">
+                          <span style="font:600 14.5px/1.25 -apple-system,sans-serif">{{ h.label }}</span>
+                          <span style="flex:1"></span>
+                          <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3);font-variant-numeric:tabular-nums">{{ h.at }}</span>
+                        </span>
+                        <span style="font:400 12.5px/1.3 -apple-system,sans-serif;color:{{ h.syncFg }}">{{ h.syncLabel }}</span>
+                        <sc-if value="{{ h.hasDetail }}" hint-placeholder-val="{{ false }}">
+                          <span style="margin-top:2px;font:400 13px/1.4 -apple-system,sans-serif;color:var(--ink2)">{{ h.detail }}</span>
+                        </sc-if>
+                      </span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onOutbox }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 16px 28px;display:flex;flex-direction:column;gap:14px">
+              <div style="font:700 34px/1.1 -apple-system,sans-serif;letter-spacing:-.022em">Outbox</div>
+
+              <div style="border-radius:14px;background:var(--card);padding:15px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:center;gap:11px">
+                  <span style="width:34px;height:34px;flex:none;border-radius:17px;background:{{ ob.iconBg }};color:{{ ob.iconFg }};display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ syncing }}" hint-placeholder-val="{{ false }}"><span style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:lmspin .7s linear infinite"></span></sc-if>
+                    <sc-if value="{{ ob.iconCheck }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.4 5 8.9 9.5 3.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                    <sc-if value="{{ ob.iconArrow }}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                    <sc-if value="{{ ob.iconBang }}" hint-placeholder-val="{{ false }}"><span style="font:700 15px/1 -apple-system,sans-serif">!</span></sc-if>
+                    <sc-if value="{{ ob.iconSlash }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 13 13" fill="none"><path d="M2 6.2a6 6 0 0 1 9 0M4 8.4a3.2 3.2 0 0 1 5 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="6.5" cy="10.6" r="1" fill="currentColor"/><path d="M1.5 1.5l10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></sc-if>
+                  </span>
+                  <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <span style="font:600 16px/1.25 -apple-system,sans-serif">{{ ob.connTitle }}</span>
+                    <span style="font:400 12.5px/1.3 -apple-system,sans-serif;color:var(--ink2)">Last confirmed {{ ob.lastSync }}</span>
+                  </span>
+                </div>
+                <button onClick="{{ syncNow }}" style="padding:14px 0;border-radius:12px;cursor:pointer;font:600 16px/1 -apple-system,sans-serif;border:0;background:{{ ob.btnBg }};color:{{ ob.btnFg }}">{{ ob.btnLabel }}</button>
+              </div>
+
+              <sc-if value="{{ ob.hasConflicts }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ ob.openConflict }}" style="text-align:left;border-radius:14px;background:var(--card);box-shadow:0 0 0 1.5px var(--pur);padding:14px 15px;cursor:pointer;border:0;display:flex;align-items:center;gap:12px">
+                  <span style="width:30px;height:30px;flex:none;border-radius:15px;background:var(--pursoft);color:var(--pur);display:flex;align-items:center;justify-content:center;font:700 14px/1 -apple-system,sans-serif">?</span>
+                  <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <span style="font:600 14.5px/1.25 -apple-system,sans-serif;color:var(--pur)">{{ ob.conflictTitle }}</span>
+                    <span style="font:400 12.5px/1.35 -apple-system,sans-serif;color:var(--ink2)">Nothing else is stuck behind it. Decide when you have a moment.</span>
+                  </span>
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="none"><path d="M1 1l6 6-6 6" stroke="var(--pur)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </sc-if>
+
+              <sc-if value="{{ ob.caughtUp }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:36px 20px 30px;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;animation:lmup .3s ease-out">
+                  <div style="width:64px;height:64px;border-radius:32px;background:var(--grnsoft);display:flex;align-items:center;justify-content:center;animation:lmpop .42s cubic-bezier(.2,1.3,.4,1)">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 12.8 9.6 17.4 19 8" stroke="var(--grn)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div style="font:600 20px/1.2 -apple-system,sans-serif;letter-spacing:-.015em">All caught up</div>
+                  <div style="font:400 14px/1.5 -apple-system,sans-serif;color:var(--ink2);max-width:262px">Everything you’ve done today is on the server. {{ ob.caughtMeta }}</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ ob.hasQueue }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="padding:0 15px;font:400 12px/1 -apple-system,sans-serif;color:var(--ink2);text-transform:uppercase;letter-spacing:.03em">Waiting to send · {{ ob.queueCount }}</div>
+                  <div style="border-radius:14px;background:var(--card);overflow:hidden">
+                    <sc-for list="{{ ob.queue }}" as="q" hint-placeholder-count="3">
+                      <div style="border-bottom:1px solid var(--sep)">
+                        <div style="display:flex;align-items:center;gap:11px;padding:12px 15px">
+                          <span style="width:28px;height:28px;flex:none;border-radius:14px;background:{{ q.iBg }};color:{{ q.iFg }};display:flex;align-items:center;justify-content:center;animation:{{ q.an }}">
+                            <sc-if value="{{ q.isBang }}" hint-placeholder-val="{{ false }}"><span style="font:700 13px/1 -apple-system,sans-serif">!</span></sc-if>
+                            <sc-if value="{{ q.isArrow }}" hint-placeholder-val="{{ true }}"><svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></sc-if>
+                          </span>
+                          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                            <span style="font:600 14.5px/1.25 -apple-system,sans-serif">{{ q.label }}</span>
+                            <span style="font:400 12.5px/1.3 -apple-system,sans-serif;color:var(--ink2)">{{ q.no }} · {{ q.name }}</span>
+                          </span>
+                          <span style="flex:none;text-align:right;display:flex;flex-direction:column;gap:2px">
+                            <span style="font:500 12.5px/1 -apple-system,sans-serif;color:{{ q.wFg }};font-variant-numeric:tabular-nums">{{ q.waited }}</span>
+                            <span style="font:400 11.5px/1 -apple-system,sans-serif;color:var(--ink3)">{{ q.attempts }}</span>
+                          </span>
+                        </div>
+                        <sc-if value="{{ q.hasReason }}" hint-placeholder-val="{{ false }}">
+                          <div style="padding:10px 15px 12px;margin-top:-4px;font:400 13px/1.45 -apple-system,sans-serif;color:var(--red)">{{ q.reason }}</div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="padding:4px 15px 0;font:400 12px/1.5 -apple-system,sans-serif;color:var(--ink3)">Changes send in the order you made them, so the server never sees a later state before an earlier one.</div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ onProfile }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 16px 28px;display:flex;flex-direction:column;gap:14px">
+              <div style="font:700 34px/1.1 -apple-system,sans-serif;letter-spacing:-.022em">Profile</div>
+              <div style="border-radius:14px;background:var(--card);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:13px;padding:15px;border-bottom:1px solid var(--sep)">
+                  <div style="width:52px;height:52px;flex:none;border-radius:26px;background:var(--tintsoft);color:var(--tint);display:flex;align-items:center;justify-content:center;font:600 19px/1 -apple-system,sans-serif">DK</div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 17px/1.25 -apple-system,sans-serif;letter-spacing:-.01em">Dana Køhler</div>
+                    <div style="font:400 13px/1.3 -apple-system,sans-serif;color:var(--ink2)">Driver 2841 · Shift 06:30–15:00</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--sep)">
+                  <span style="font:400 15px/1.3 -apple-system,sans-serif">Vehicle</span>
+                  <span style="font:400 15px/1.3 -apple-system,sans-serif;color:var(--ink2)">Van 14 · LM 41 208</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 15px">
+                  <span style="font:400 15px/1.3 -apple-system,sans-serif">Depot</span>
+                  <span style="font:400 15px/1.3 -apple-system,sans-serif;color:var(--ink2)">Northgate</span>
+                </div>
+              </div>
+
+              <div style="border-radius:14px;background:var(--card);padding:14px 15px;display:flex;flex-direction:column;gap:11px">
+                <div style="font:400 15px/1.3 -apple-system,sans-serif">Appearance</div>
+                <div style="display:flex;gap:2px;background:var(--fill);border-radius:9px;padding:2px">
+                  <sc-for list="{{ themes }}" as="t" hint-placeholder-count="3">
+                    <button onClick="{{ t.on }}" style="flex:1;padding:9px 0;border-radius:7px;cursor:pointer;font:600 13px/1 -apple-system,sans-serif;border:0;background:{{ t.pbg }};color:{{ t.pfg }};box-shadow:{{ t.psh }}">{{ t.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="font:400 12px/1.4 -apple-system,sans-serif;color:var(--ink3)">{{ themeNote }}</div>
+              </div>
+
+              <div style="border-radius:14px;background:var(--card);padding:14px 15px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font:400 15px/1.3 -apple-system,sans-serif">On this phone</span>
+                  <span style="font:400 13px/1.3 -apple-system,sans-serif;color:var(--ink2)">{{ storage.used }}</span>
+                </div>
+                <div style="height:5px;border-radius:3px;background:var(--fill);overflow:hidden;display:flex">
+                  <span style="width:{{ storage.pct }};background:var(--or);border-radius:3px"></span>
+                </div>
+                <div style="font:400 12px/1.45 -apple-system,sans-serif;color:var(--ink3)">{{ storage.detail }}. Photos are removed from the phone once the server confirms it has them.</div>
+              </div>
+
+              <button onClick="{{ askSignOut }}" style="padding:14px 0;border-radius:14px;cursor:pointer;font:400 16px/1 -apple-system,sans-serif;border:0;background:var(--card);color:var(--red)">Sign Out</button>
+              <div style="font:400 12px/1.5 -apple-system,sans-serif;color:var(--ink3);text-align:center;padding:0 12px">Lastmile 4.2.1 · works with no signal · your work stays on this device until the server confirms it</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="flex:none;display:flex;padding:6px 8px 24px;background:var(--bar);backdrop-filter:blur(20px);border-top:1px solid var(--sep)">
+          <button onClick="{{ goRoute }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 5px;background:transparent;border:0;cursor:pointer;color:{{ tabs.route }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18" r="2.6" stroke="currentColor" stroke-width="1.8"/><path d="M6 8.6v3.9a3 3 0 0 0 3 3h6a3 3 0 0 1 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span style="font:500 10px/1 -apple-system,sans-serif">Route</span>
+          </button>
+          <button onClick="{{ goOutbox }}" style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 5px;background:transparent;border:0;cursor:pointer;color:{{ tabs.outbox }}">
+            <span style="position:relative">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 14v4.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 15V4m0 0L7.8 8.2M12 4l4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+                <span style="position:absolute;top:-4px;right:-10px;min-width:18px;height:18px;padding:0 5px;box-sizing:border-box;border-radius:9px;background:{{ badge.bg }};color:#fff;font:600 11px/18px -apple-system,sans-serif;text-align:center;font-variant-numeric:tabular-nums">{{ badge.n }}</span>
+              </sc-if>
+            </span>
+            <span style="font:500 10px/1 -apple-system,sans-serif">Outbox</span>
+          </button>
+          <button onClick="{{ goProfile }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 0 5px;background:transparent;border:0;cursor:pointer;color:{{ tabs.profile }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.4" stroke="currentColor" stroke-width="1.8"/><path d="M5 20c.9-3.4 3.6-5.2 7-5.2s6.1 1.8 7 5.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span style="font:500 10px/1 -apple-system,sans-serif">Profile</span>
+          </button>
+        </div>
+
+        <sc-if value="{{ showUpdateCta }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;bottom:78px;padding:12px 16px 16px;background:linear-gradient(to top,var(--bg) 55%,transparent)">
+            <button onClick="{{ openUpdate }}" style="width:100%;padding:16px 0;border-radius:14px;cursor:pointer;font:600 17px/1 -apple-system,sans-serif;border:0;background:var(--tint);color:#fff">Update Status</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheet.open }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--scrim);z-index:5;animation:lmfade .2s ease-out">
+            <div style="position:absolute;left:0;right:0;bottom:0;top:76px;background:var(--bg);border-radius:16px 16px 0 0;display:flex;flex-direction:column;animation:lmsheet .28s cubic-bezier(.2,.8,.25,1);overflow:hidden">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center;padding:7px 0 0"><span style="width:36px;height:5px;border-radius:3px;background:var(--ink3)"></span></div>
+              <div style="flex:none;display:flex;align-items:center;gap:12px;padding:10px 16px 12px;border-bottom:1px solid var(--sep)">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+                  <div style="font:600 16px/1.25 -apple-system,sans-serif;letter-spacing:-.01em">{{ sheet.name }}</div>
+                  <div style="font:400 12px/1.2 -apple-system,sans-serif;color:var(--ink2);font-variant-numeric:tabular-nums">{{ sheet.no }} · stop {{ sheet.stop }}</div>
+                </div>
+                <button onClick="{{ closeSheet }}" style="flex:none;width:32px;height:32px;border-radius:16px;cursor:pointer;border:0;background:var(--fill);color:var(--ink2);display:flex;align-items:center;justify-content:center;font:600 15px/1 -apple-system,sans-serif">✕</button>
+              </div>
+              <div style="flex:1;min-height:0;overflow-y:auto;padding:16px 16px 20px;display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="font:600 20px/1.2 -apple-system,sans-serif;letter-spacing:-.015em">What happened here?</div>
+                  <div style="border-radius:14px;background:var(--card);overflow:hidden">
+                    <sc-for list="{{ sheet.choices }}" as="c" hint-placeholder-count="4">
+                      <button onClick="{{ c.on }}" style="display:flex;align-items:center;gap:12px;width:100%;padding:15px;cursor:pointer;text-align:left;border:0;background:{{ c.bg }};border-bottom:1px solid var(--sep)">
+                        <span style="width:8px;height:8px;flex:none;border-radius:4px;background:{{ c.dot }}"></span>
+                        <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                          <span style="font:600 16px/1.2 -apple-system,sans-serif;color:var(--ink)">{{ c.label }}</span>
+                          <span style="font:400 12.5px/1.3 -apple-system,sans-serif;color:var(--ink2)">{{ c.hint }}</span>
+                        </span>
+                        <sc-if value="{{ c.sel }}" hint-placeholder-val="{{ false }}">
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 9.6 7.2 13.3 14.5 5" stroke="var(--tint)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </sc-if>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <sc-if value="{{ sheet.needReason }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:10px;animation:lmup .2s ease-out">
+                    <div style="font:600 15px/1.2 -apple-system,sans-serif">Why not?</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                      <sc-for list="{{ sheet.reasons }}" as="r" hint-placeholder-count="4">
+                        <button onClick="{{ r.on }}" style="padding:12px 15px;border-radius:20px;cursor:pointer;font:600 14px/1 -apple-system,sans-serif;border:0;background:{{ r.bg }};color:{{ r.fg }}">{{ r.label }}</button>
+                      </sc-for>
+                    </div>
+                    <textarea value="{{ sheet.notes }}" onChange="{{ setNotes }}" placeholder="Anything dispatch should know (optional)" rows="3" style="width:100%;box-sizing:border-box;resize:none;padding:13px 14px;border-radius:12px;border:0;background:var(--card);color:var(--ink);font:400 15px/1.45 -apple-system,sans-serif;outline:none"></textarea>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sheet.needProof }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:10px;animation:lmup .2s ease-out">
+                    <div style="display:flex;align-items:baseline;gap:7px">
+                      <span style="font:600 15px/1.2 -apple-system,sans-serif">Proof</span>
+                      <span style="font:400 12px/1 -apple-system,sans-serif;color:var(--ink3)">optional</span>
+                    </div>
+                    <input value="{{ sheet.recipient }}" onChange="{{ setRecipient }}" placeholder="Who took it?" style="width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:0;background:var(--card);color:var(--ink);font:400 16px/1 -apple-system,sans-serif;outline:none">
+                    <sc-if value="{{ sheet.noPhoto }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ capturePhoto }}" style="display:flex;align-items:center;gap:13px;padding:14px 15px;border-radius:12px;cursor:pointer;text-align:left;border:0;background:var(--card);color:var(--ink)">
+                        <span style="flex:none;width:40px;height:40px;border-radius:20px;background:var(--tintsoft);color:var(--tint);display:flex;align-items:center;justify-content:center">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="6.5" width="18" height="13.5" rx="2.5" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="13.2" r="3.4" stroke="currentColor" stroke-width="1.7"/><path d="M8.6 6.5 9.8 4h4.4l1.2 2.5" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+                        </span>
+                        <span style="flex:1;display:flex;flex-direction:column;gap:2px">
+                          <span style="font:600 15px/1.2 -apple-system,sans-serif">Take a photo</span>
+                          <span style="font:400 12.5px/1.3 -apple-system,sans-serif;color:var(--ink2)">Stays on the phone until it’s sent</span>
+                        </span>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{ sheet.hasPhoto }}" hint-placeholder-val="{{ false }}">
+                      <div style="border-radius:12px;background:var(--card);overflow:hidden;animation:lmup .2s ease-out">
+                        <div style="height:124px;background:var(--fill2);position:relative;display:flex;align-items:center;justify-content:center">
+                          <span style="font:500 11px/1 -apple-system,sans-serif;color:var(--ink3);letter-spacing:.08em">PHOTO PLACEHOLDER</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;padding:11px 14px">
+                          <span style="width:20px;height:20px;flex:none;border-radius:10px;background:var(--orsoft);color:var(--or);display:flex;align-items:center;justify-content:center">
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          </span>
+                          <span style="flex:1;display:flex;flex-direction:column;gap:1px">
+                            <span style="font:600 13px/1.2 -apple-system,sans-serif;color:var(--or)">On this phone</span>
+                            <span style="font:400 11.5px/1.2 -apple-system,sans-serif;color:var(--ink3)">1.4 MB · not uploaded yet</span>
+                          </span>
+                          <button onClick="{{ capturePhoto }}" style="flex:none;padding:8px 13px;border-radius:15px;cursor:pointer;font:600 12.5px/1 -apple-system,sans-serif;border:0;background:var(--fill);color:var(--tint)">Retake</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <div style="height:12px"></div>
+              </div>
+              <div style="flex:none;padding:12px 16px 28px;border-top:1px solid var(--sep);background:var(--bar);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:8px">
+                <button onClick="{{ saveUpdate }}" style="width:100%;padding:16px 0;border-radius:14px;cursor:pointer;font:600 17px/1 -apple-system,sans-serif;border:0;background:{{ sheet.saveBg }};color:{{ sheet.saveFg }}">{{ sheet.saveLabel }}</button>
+                <div style="font:400 12px/1.4 -apple-system,sans-serif;color:var(--ink3);text-align:center">{{ sheet.hint }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ack.open }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--bg);z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 30px;text-align:center">
+            <div style="width:72px;height:72px;border-radius:36px;background:var(--grnsoft);display:flex;align-items:center;justify-content:center;animation:lmpop .4s cubic-bezier(.2,1.3,.4,1)">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.6 9.5 17 19 8" stroke="var(--grn)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font:700 24px/1.15 -apple-system,sans-serif;letter-spacing:-.02em">{{ ack.title }}</div>
+            <div style="font:400 15px/1.5 -apple-system,sans-serif;color:var(--ink2);max-width:270px">{{ ack.body }}</div>
+            <div style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:17px;background:{{ ack.pillBg }};color:{{ ack.pillFg }}">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span style="font:600 12.5px/1 -apple-system,sans-serif">{{ ack.pill }}</span>
+            </div>
+            <button onClick="{{ dismissAck }}" style="margin-top:12px;width:100%;max-width:300px;padding:16px 0;border-radius:14px;cursor:pointer;font:600 17px/1 -apple-system,sans-serif;border:0;background:var(--tint);color:#fff">Next Stop</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--bg);z-index:7;display:flex;flex-direction:column">
+            <div style="height:58px;flex:none"></div>
+            <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+              <div style="font:700 30px/1.12 -apple-system,sans-serif;letter-spacing:-.02em">Good morning</div>
+              <div style="font:400 14px/1.5 -apple-system,sans-serif;color:var(--ink2)">First open today, so nothing is on the phone yet. This is the one moment Lastmile needs signal.</div>
+              <div style="margin-top:4px;display:flex;align-items:center;gap:9px">
+                <span style="width:15px;height:15px;border-radius:50%;border:2px solid var(--fill2);border-top-color:var(--tint);animation:lmspin .7s linear infinite"></span>
+                <span style="font:400 13px/1 -apple-system,sans-serif;color:var(--ink2)">{{ loadMsg }}</span>
+              </div>
+            </div>
+            <div style="padding:8px 16px;display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ skeleton }}" as="s" hint-placeholder-count="5">
+                <div style="border-radius:14px;background:var(--card);padding:15px;display:flex;gap:12px;align-items:center;opacity:{{ s.op }};animation:lmshim 1.5s ease-in-out infinite;animation-delay:{{ s.d }}">
+                  <span style="width:34px;height:34px;flex:none;border-radius:17px;background:var(--fill)"></span>
+                  <span style="flex:1;display:flex;flex-direction:column;gap:8px">
+                    <span style="width:58%;height:13px;border-radius:6px;background:var(--fill)"></span>
+                    <span style="width:80%;height:10px;border-radius:5px;background:var(--fill)"></span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ signOut }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:var(--scrim);z-index:8;display:flex;align-items:flex-end;padding:10px 10px 26px;animation:lmfade .18s ease-out">
+            <div style="width:100%;display:flex;flex-direction:column;gap:9px;animation:lmup .22s ease-out">
+              <div style="border-radius:16px;background:var(--card);overflow:hidden">
+                <div style="padding:18px 18px 14px;display:flex;flex-direction:column;gap:6px;text-align:center;border-bottom:1px solid var(--sep)">
+                  <div style="font:600 16px/1.3 -apple-system,sans-serif">{{ so.title }}</div>
+                  <div style="font:400 13.5px/1.5 -apple-system,sans-serif;color:var(--ink2)">{{ so.body }}</div>
+                </div>
+                <button onClick="{{ so.primary }}" style="width:100%;padding:16px 0;cursor:pointer;font:{{ so.pfont }};border:0;background:transparent;color:{{ so.pcol }}">{{ so.plabel }}</button>
+              </div>
+              <button onClick="{{ cancelSignOut }}" style="width:100%;padding:16px 0;border-radius:16px;cursor:pointer;font:600 17px/1 -apple-system,sans-serif;border:0;background:var(--card);color:var(--tint)">{{ so.cancelLabel }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:16px;right:16px;bottom:96px;z-index:9;padding:13px 16px;border-radius:14px;background:var(--card);box-shadow:0 8px 28px rgba(0,0,0,.18);display:flex;align-items:center;gap:10px;animation:lmup .22s ease-out">
+            <span style="width:20px;height:20px;flex:none;border-radius:10px;background:var(--orsoft);color:var(--or);display:flex;align-items:center;justify-content:center">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 10V2m0 0L2.5 5.5M6 2l3.5 3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span style="font:400 13.5px/1.4 -apple-system,sans-serif;color:var(--ink)">{{ toast }}</span>
+          </div>
+        </sc-if>
+      </div>
+    </x-import>
+  </div>
+
+  <aside style="width:280px;flex:none;display:flex;flex-direction:column;gap:14px;position:sticky;top:44px">
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">The point of view</div>
+      <div style="font:600 14px/1.4 -apple-system,sans-serif;color:#1C1C1E">Calm by default. Orange only when the phone owes the server something.</div>
+      <div style="font:400 12.5px/1.55 -apple-system,sans-serif;color:#5A5A5F">A bright, quiet, native-feeling app. No permanent warning chrome — one status card at the top of the route says the honest thing, and a small orange “1 to send” pill appears only on rows that haven’t reached the server.</div>
+    </div>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">Rules</div>
+      <div style="font:400 12.5px/1.55 -apple-system,sans-serif;color:#5A5A5F">Offline is neutral gray — a fact, not an error. Sync-failed is the only red. Conflicts are purple and rare. Green appears exactly twice: shift progress, and the all-caught-up moment.</div>
+      <div style="font:400 12.5px/1.55 -apple-system,sans-serif;color:#5A5A5F">Synced work shows nothing at all on the route — absence of the orange pill is the “done” state, so the list stays readable at arm’s length.</div>
+    </div>
+    <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font:600 10px/1 -apple-system,sans-serif;color:#8E8E93;letter-spacing:.08em;text-transform:uppercase">Where I diverged</div>
+      <div style="font:400 12.5px/1.55 -apple-system,sans-serif;color:#5A5A5F">Screen 4 is split: <span style="color:#1C1C1E;font-weight:600">Outbox</span> (queue, sync, conflicts) and <span style="color:#1C1C1E;font-weight:600">Profile</span> (driver, van, sign-out). Conflicts resolve on the order itself, with the address and history in view.</div>
+    </div>
+  </aside>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1080,&quot;height&quot;:980}}">
+const SM = {
+  'Pending':    { dot: 'var(--gray)', fg: 'var(--gray)',  bg: 'var(--fill)' },
+  'Confirmed':  { dot: 'var(--tint)', fg: 'var(--tint)',  bg: 'var(--tintsoft)' },
+  'In transit': { dot: 'var(--ind)',  fg: 'var(--ind)',   bg: 'var(--indsoft)' },
+  'Delivered':  { dot: 'var(--grn)',  fg: 'var(--grn)',   bg: 'var(--grnsoft)' },
+  'Failed':     { dot: 'var(--red)',  fg: 'var(--red)',   bg: 'var(--redsoft)' },
+};
+const RANK = { 'Pending': 0, 'Confirmed': 1, 'In transit': 2, 'Failed': 3, 'Delivered': 4 };
+const REASONS = ['Nobody home', 'Refused', 'Access problem', 'Damaged'];
+function pad(n) { return n < 10 ? '0' + n : '' + n; }
+function ago(ms, now) {
+  const s = Math.max(0, Math.round((now - ms) / 1000));
+  if (s < 60) return s + 's ago';
+  const m = Math.round(s / 60);
+  if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60);
+  return h + 'h ' + (m % 60) + 'm ago';
+}
+function clock(mins, now) {
+  const d = new Date(now - mins * 60000);
+  return pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+const RAW = [
+  ['LM-4102', 'Marta Reyes', '12 Alder Street', 'Flat 2, north entrance', '08:00–10:00', '', 'Delivered', [['Parcel — small box', 1, 'BX-01']]],
+  ['LM-4108', 'Ivo Brandt', '4 Kestrel Yard', 'Unit C, behind the gate', '08:30–10:30', '', 'Delivered', [['Crate — chilled', 2, 'CR-14'], ['Parcel — envelope', 1, 'EV-02']]],
+  ['LM-4114', 'Selma Fournier', '88 Harbour View', 'Apt 3B, buzzer 12', '09:00–11:00', 'Buzzer broken — call on arrival', 'Failed', [['Parcel — medium box', 3, 'BX-04']]],
+  ['LM-4121', 'Otto Lindqvist', '7 Milton Row', 'Blue door, side of house', '09:30–11:30', '', 'In transit', [['Pallet — half', 1, 'PL-08']]],
+  ['LM-4126', 'Rani Devarajan', '203 Cedar Wharf', 'Loading bay 2', '10:00–12:00', 'Bay closes at noon', 'Confirmed', [['Crate — dry goods', 4, 'CR-02'], ['Parcel — small box', 2, 'BX-01']]],
+  ['LM-4133', 'Tomas Ek', '19 Slate Lane', 'Ring twice', '10:30–12:30', '', 'Confirmed', [['Parcel — large box', 1, 'BX-09']]],
+  ['LM-4139', 'Halima Nasser', 'Bramble Court, 5', 'Ground floor, rear', '11:00–13:00', '', 'Confirmed', [['Parcel — envelope', 2, 'EV-02']]],
+  ['LM-4144', 'Peder Aas', '61 Quarry Road', 'Farm gate, second track', '11:30–13:30', 'No signal here — gate code 4417', 'Pending', [['Crate — feed', 6, 'CR-21']]],
+  ['LM-4150', 'Yuki Amano', 'Northgate Studios', 'Studio 14, third floor', '12:00–14:00', '', 'Pending', [['Parcel — fragile', 1, 'FR-03']]],
+  ['LM-4157', 'Emine Yildiz', '34 Foundry Street', 'Shop front', '12:30–14:30', '', 'Pending', [['Crate — dry goods', 3, 'CR-02']]],
+  ['LM-4163', 'Gustav Holm', 'Riverside Depot', 'Gate 4, ask for stores', '13:00–15:00', '', 'Pending', [['Pallet — full', 2, 'PL-01']]],
+  ['LM-4170', 'Amara Diallo', '9 Wexford Close', 'Green bin by the porch', '13:30–15:30', 'Leave in porch, do not ring', 'Pending', [['Parcel — small box', 1, 'BX-01']]],
+];
+
+function mkOrders() {
+  return RAW.map((r, i) => {
+    const status = r[6];
+    const hist = [{ label: 'Assigned to you', mins: 340 - i * 4, synced: true, detail: '' }];
+    if (RANK[status] >= 1) hist.push({ label: 'Confirmed', mins: 300 - i * 6, synced: true, detail: '' });
+    if (RANK[status] >= 2 && status !== 'Failed') hist.push({ label: 'In transit', mins: 120 - i * 5, synced: true, detail: '' });
+    if (status === 'Delivered') hist.push({ label: 'Delivered', mins: 96 - i * 8, synced: true, detail: 'Signed for by ' + r[1].split(' ')[0] });
+    if (status === 'Failed') hist.push({ label: 'Couldn’t deliver', mins: 41, synced: true, detail: 'Nobody home · card left' });
+    return { id: i + 1, stop: i + 1, no: r[0], name: r[1], addr: r[2], addr2: r[3], win: r[4], notes: r[5], status, items: r[7].map(x => ({ n: x[0], q: x[1], sku: x[2] })), conflict: null, hist: hist.reverse() };
+  });
+}
+
+class Component extends DCLogic {
+  state = (() => {
+    const orders = mkOrders();
+    return {
+      orders, screen: 'route', filter: 'all', detailId: null,
+      conn: 'online', syncing: false, lastSync: Date.now() - 4 * 60000,
+      queue: [
+        { id: 'q1', oid: 2, label: 'Status → Delivered', since: Date.now() - 9 * 60000, attempts: 0, state: 'queued', fail: false },
+        { id: 'q2', oid: 2, label: 'Photo · 1.4 MB', since: Date.now() - 9 * 60000, attempts: 0, state: 'queued', fail: false },
+        { id: 'q3', oid: 3, label: 'Couldn’t deliver · nobody home', since: Date.now() - 3 * 60000, attempts: 0, state: 'queued', fail: false },
+      ],
+      theme: 'light', now: Date.now(), loading: false, signOut: false, toast: '',
+      celebrate: false, loadMsg: 'Reaching dispatch…',
+      sheet: { open: false, oid: null, status: null, reason: null, notes: '', recipient: '', photo: false },
+      ack: { open: false, status: '' }, qn: 4,
+    };
+  })();
+
+  timers = [];
+  componentDidMount() { this.tick = setInterval(() => this.setState({ now: Date.now() }), 5000); }
+  componentWillUnmount() { clearInterval(this.tick); this.timers.forEach(clearTimeout); }
+  later(fn, ms) { const t = setTimeout(fn, ms); this.timers.push(t); return t; }
+  flash(msg) { this.setState({ toast: msg }); this.later(() => this.setState({ toast: '' }), 3200); }
+
+  qFor(id) { return this.state.queue.filter(q => q.oid === id); }
+  kindFor(o) {
+    if (o.conflict) return 'conflict';
+    const q = this.qFor(o.id);
+    if (!q.length) return 'synced';
+    if (q.some(x => x.state === 'sending')) return 'sending';
+    if (q.some(x => x.state === 'failed')) return 'failed';
+    return 'local';
+  }
+
+  go(s) { this.setState({ screen: s, toast: '' }); }
+  openOrder(id) { this.setState({ screen: 'detail', detailId: id }); }
+
+  syncNow = () => {
+    if (this.state.loading) return;
+    if (this.state.conn === 'offline') { this.flash('No signal. Everything you’ve done is safe on the phone.'); return; }
+    if (this.state.syncing) return;
+    const q = this.state.queue.slice();
+    if (!q.length) { this.setState({ lastSync: Date.now() }); this.flash('Checked — the server already has everything.'); return; }
+    this.setState({ syncing: true });
+    let i = 0;
+    const step = () => {
+      const e = q[i];
+      if (!e) {
+        const left = this.state.queue.length;
+        this.setState({ syncing: false, lastSync: Date.now(), celebrate: left === 0 });
+        if (left === 0) this.later(() => this.setState({ celebrate: false }), 4000);
+        return;
+      }
+      this.setState(s => ({ queue: s.queue.map(x => x.id === e.id ? Object.assign({}, x, { state: 'sending' }) : x) }));
+      this.later(() => {
+        if (e.fail) {
+          this.setState(s => ({ queue: s.queue.map(x => x.id === e.id ? Object.assign({}, x, { state: 'failed', attempts: x.attempts + 1 }) : x) }));
+        } else {
+          this.setState(s => ({
+            queue: s.queue.filter(x => x.id !== e.id),
+            orders: s.orders.map(o => o.id === e.oid ? Object.assign({}, o, { hist: o.hist.map(h => h.qid === e.id ? Object.assign({}, h, { synced: true }) : h) }) : o),
+          }));
+        }
+        i++; this.later(step, 180);
+      }, 620);
+    };
+    this.later(step, 320);
+  };
+
+  toggleConn = () => {
+    const off = this.state.conn === 'online';
+    this.setState({ conn: off ? 'offline' : 'online', syncing: false });
+    if (off) this.flash('Signal lost. Keep working — nothing will be dropped.');
+    else this.later(this.syncNow, 700);
+  };
+
+  openUpdate = () => {
+    const id = this.state.detailId;
+    this.setState({ sheet: { open: true, oid: id, status: null, reason: null, notes: '', recipient: '', photo: false } });
+  };
+  closeSheet = () => this.setState({ sheet: Object.assign({}, this.state.sheet, { open: false }) });
+  pick(status) { this.setState({ sheet: Object.assign({}, this.state.sheet, { status, reason: status === 'Failed' ? this.state.sheet.reason : null }) }); }
+  pickReason(r) { this.setState({ sheet: Object.assign({}, this.state.sheet, { reason: r }) }); }
+  setNotes = e => this.setState({ sheet: Object.assign({}, this.state.sheet, { notes: e.target.value }) });
+  setRecipient = e => this.setState({ sheet: Object.assign({}, this.state.sheet, { recipient: e.target.value }) });
+  capturePhoto = () => this.setState({ sheet: Object.assign({}, this.state.sheet, { photo: true }) });
+
+  saveUpdate = () => {
+    const sh = this.state.sheet;
+    if (!sh.status) return;
+    const online = this.state.conn === 'online' && !this.state.loading;
+    const qid = 'q' + this.state.qn;
+    const extra = [];
+    if (sh.status === 'Failed' && sh.reason) extra.push(sh.reason);
+    if (sh.recipient) extra.push('Taken by ' + sh.recipient);
+    if (sh.photo) extra.push('1 photo');
+    if (sh.notes) extra.push('“' + sh.notes + '”');
+    const label = sh.status === 'Failed' ? ('Couldn’t deliver' + (sh.reason ? ' · ' + sh.reason.toLowerCase() : '')) : ('Status → ' + sh.status);
+    const entries = [{ id: qid, oid: sh.oid, label, since: Date.now(), attempts: 0, state: 'queued', fail: false }];
+    if (sh.photo) entries.push({ id: qid + 'p', oid: sh.oid, label: 'Photo · 1.4 MB', since: Date.now(), attempts: 0, state: 'queued', fail: false });
+    this.setState(s => ({
+      qn: s.qn + 1,
+      queue: s.queue.concat(entries),
+      orders: s.orders.map(o => o.id === sh.oid ? Object.assign({}, o, {
+        status: sh.status,
+        hist: [{ label: sh.status === 'Failed' ? 'Couldn’t deliver' : sh.status, mins: 0, synced: false, qid, detail: extra.join(' · ') }].concat(o.hist),
+      }) : o),
+      sheet: Object.assign({}, s.sheet, { open: false }),
+      ack: { open: true, status: sh.status },
+    }));
+    if (online) this.later(this.syncNow, 900);
+  };
+  dismissAck = () => this.setState({ ack: { open: false, status: '' }, screen: 'route', detailId: null });
+
+  resolve(which) {
+    const id = this.state.detailId;
+    this.setState(s => ({
+      orders: s.orders.map(o => {
+        if (o.id !== id || !o.conflict) return o;
+        const next = which === 'local' ? o.conflict.localStatus : o.conflict.serverStatus;
+        return Object.assign({}, o, {
+          status: next, conflict: null,
+          hist: [{ label: 'You resolved it → ' + next, mins: 0, synced: false, qid: 'qr' + id, detail: which === 'local' ? 'Kept the version on this phone' : 'Took the server’s version' }].concat(o.hist),
+        });
+      }),
+      queue: s.queue.concat([{ id: 'qr' + id, oid: id, label: 'Conflict resolved', since: Date.now(), attempts: 0, state: 'queued', fail: false }]),
+    }));
+    this.flash('Decision saved on the phone. It goes up with everything else.');
+  }
+
+  askSignOut = () => this.setState({ signOut: true });
+  cancelSignOut = () => this.setState({ signOut: false });
+
+  scenario(name) {
+    this.timers.forEach(clearTimeout); this.timers = [];
+    const orders = mkOrders();
+    const base = { orders, screen: 'route', detailId: null, filter: 'all', syncing: false, loading: false, celebrate: false, toast: '', signOut: false, sheet: { open: false, oid: null, status: null, reason: null, notes: '', recipient: '', photo: false }, ack: { open: false, status: '' }, qn: 20, now: Date.now() };
+    const q = (id, oid, label, mins, attempts, state, fail) => ({ id, oid, label, since: Date.now() - mins * 60000, attempts: attempts || 0, state: state || 'queued', fail: !!fail });
+    if (name === 'shift') {
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 4 * 60000, queue: [q('a1', 2, 'Status → Delivered', 9), q('a2', 2, 'Photo · 1.4 MB', 9), q('a3', 3, 'Couldn’t deliver · nobody home', 3)] }));
+    } else if (name === 'offline') {
+      orders[3].status = 'Delivered'; orders[4].status = 'Delivered';
+      this.setState(Object.assign(base, {
+        conn: 'offline', lastSync: Date.now() - 47 * 60000,
+        queue: [q('b1', 2, 'Status → Delivered', 44), q('b2', 2, 'Photo · 1.4 MB', 44), q('b3', 3, 'Couldn’t deliver · access problem', 31), q('b4', 4, 'Status → Delivered', 18), q('b5', 5, 'Status → Delivered', 6), q('b6', 5, 'Photo · 1.1 MB', 6)],
+      }));
+    } else if (name === 'syncing') {
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 12 * 60000, queue: [q('c1', 2, 'Status → Delivered', 12), q('c2', 2, 'Photo · 1.4 MB', 12), q('c3', 3, 'Couldn’t deliver · refused', 8), q('c4', 4, 'Status → In transit', 2)] }));
+      this.later(this.syncNow, 260);
+    } else if (name === 'failed') {
+      this.setState(Object.assign(base, {
+        conn: 'online', lastSync: Date.now() - 21 * 60000,
+        queue: [Object.assign(q('d1', 3, 'Couldn’t deliver · damaged', 21, 3, 'failed', true), { reason: 'The server rejected this: the reason code needs a photo attached. It will keep trying, and dispatch has been told.' }), q('d2', 4, 'Status → Delivered', 5)],
+      }));
+    } else if (name === 'conflict') {
+      orders[3].conflict = { localStatus: 'Delivered', serverStatus: 'Failed', localAt: clock(26, Date.now()), serverAt: clock(22, Date.now()), localNote: 'You marked it delivered, photo attached, taken by O. Lindqvist.', serverNote: 'Dispatch marked it failed after the customer phoned to say nothing arrived.' };
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 2 * 60000, queue: [q('e1', 4, 'Status → Delivered', 26)], screen: 'detail', detailId: 4 }));
+    } else if (name === 'caught') {
+      orders.forEach((o, i) => { if (i < 7) o.status = 'Delivered'; });
+      this.setState(Object.assign(base, { conn: 'online', lastSync: Date.now() - 8000, queue: [], screen: 'outbox', celebrate: true }));
+      this.later(() => this.setState({ celebrate: false }), 4500);
+    } else if (name === 'empty') {
+      this.setState(Object.assign(base, { orders: [], conn: 'online', lastSync: Date.now() - 3 * 60000, queue: [] }));
+    } else if (name === 'loading') {
+      this.setState(Object.assign(base, { orders: [], conn: 'online', lastSync: 0, queue: [], loading: true, loadMsg: 'Reaching dispatch…' }));
+      this.later(() => this.setState({ loadMsg: 'Downloading 12 stops…' }), 1300);
+      this.later(() => this.setState({ loadMsg: 'Saving to this phone…' }), 2500);
+      this.later(() => this.setState({ orders: mkOrders(), loading: false, lastSync: Date.now(), queue: [] }), 3500);
+    }
+  }
+
+  renderVals() {
+    const s = this.state, now = s.now, orders = s.orders;
+    const dark = s.theme === 'dark';
+    const pending = s.queue.length;
+    const failedQ = s.queue.filter(q => q.state === 'failed');
+    const conflicts = orders.filter(o => o.conflict);
+    const done = orders.filter(o => o.status === 'Delivered' || o.status === 'Failed').length;
+    const total = orders.length;
+
+    // status card (the honest line at the top of Route)
+    let strip;
+    const base = { spin: false, arrow: false, check: false, bang: false, slash: false, hasAction: false, an: 'none', action: () => {} };
+    if (s.loading) strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--ink)', iconBg: 'var(--fill2)', iconFg: 'var(--ink2)', spin: true, title: 'Setting up', meta: 'nothing saved on the phone yet' });
+    else if (conflicts.length) strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--pur)', iconBg: 'var(--pur)', iconFg: '#fff', bang: true, title: conflicts.length + (conflicts.length === 1 ? ' stop needs your decision' : ' stops need your decision'), meta: 'everything else is synced', hasAction: true, actionLabel: 'Review', action: () => this.openOrder(conflicts[0].id) });
+    else if (failedQ.length) strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--red)', iconBg: 'var(--red)', iconFg: '#fff', bang: true, title: failedQ.length + (failedQ.length === 1 ? ' change the server won’t take' : ' changes the server won’t take'), meta: 'retrying on its own · attempt ' + (failedQ[0].attempts + 1) + ' next', hasAction: true, actionLabel: 'Look', action: () => this.go('outbox') });
+    else if (s.syncing) strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--ink)', iconBg: 'var(--or)', iconFg: '#fff', spin: true, title: 'Sending ' + pending + (pending === 1 ? ' change' : ' changes'), meta: 'keep driving — this finishes on its own' });
+    else if (s.conn === 'offline') strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--ink)', iconBg: 'var(--fill2)', iconFg: 'var(--ink2)', slash: true, title: pending ? 'No signal — ' + pending + ' saved here' : 'No signal — nothing waiting', meta: 'last reached the server ' + ago(s.lastSync, now) });
+    else if (pending) strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--ink)', iconBg: 'var(--or)', iconFg: '#fff', arrow: true, title: pending + (pending === 1 ? ' change to send' : ' changes to send'), meta: 'oldest waiting ' + ago(Math.min.apply(null, s.queue.map(q => q.since)), now).replace(' ago', ''), hasAction: true, actionLabel: 'Send', action: this.syncNow });
+    else if (s.celebrate) strip = Object.assign({}, base, { bg: 'var(--grnsoft)', fg: 'var(--grn)', iconBg: 'var(--grn)', iconFg: '#fff', check: true, title: 'All caught up', meta: 'everything is on the server' });
+    else strip = Object.assign({}, base, { bg: 'var(--card)', fg: 'var(--ink2)', iconBg: 'var(--fill2)', iconFg: 'var(--ink2)', check: true, title: 'Everything synced', meta: 'server confirmed ' + ago(s.lastSync, now) });
+
+    const counts = { all: total, Pending: 0, Confirmed: 0, 'In transit': 0, Delivered: 0, Failed: 0 };
+    orders.forEach(o => { counts[o.status]++; });
+    const filters = [['all', 'All'], ['Pending', 'Pending'], ['Confirmed', 'Confirmed'], ['In transit', 'In transit'], ['Delivered', 'Delivered'], ['Failed', 'Failed']].map(k => {
+      const act = s.filter === k[0];
+      return { label: k[1], count: counts[k[0]], on: () => this.setState({ filter: k[0] }),
+        bg: act ? 'var(--ink)' : 'var(--card)', fg: act ? 'var(--bg)' : 'var(--ink)', bd: act ? 'var(--ink)' : 'var(--sep)' };
+    });
+
+    const filtered = s.filter === 'all' ? orders : orders.filter(o => o.status === s.filter);
+    const visible = filtered.map(o => {
+      const m = SM[o.status], k = this.kindFor(o);
+      const fin = o.status === 'Delivered' || o.status === 'Failed';
+      const nItems = o.items.reduce((a, b) => a + b.q, 0);
+      const b = k === 'conflict' ? { bg: 'var(--pursoft)', fg: 'var(--pur)', l: 'Decide', an: 'none' }
+        : k === 'sending' ? { bg: 'var(--orsoft)', fg: 'var(--or)', l: 'Sending', an: 'lmpulse 1s ease-in-out infinite' }
+        : k === 'failed' ? { bg: 'var(--redsoft)', fg: 'var(--red)', l: 'Retry ' + Math.max.apply(null, this.qFor(o.id).map(x => x.attempts)), an: 'none' }
+        : k === 'local' ? { bg: 'var(--orsoft)', fg: 'var(--or)', l: this.qFor(o.id).length + ' to send', an: 'none' } : null;
+      return {
+        id: o.id, no: o.no, name: o.name, stop: o.stop, addr: o.addr, win: o.win, status: o.status,
+        itemsLabel: nItems + (nItems === 1 ? ' item' : ' items'),
+        stDot: m.dot, stFg: m.fg,
+        numBg: fin ? 'var(--fill)' : 'var(--tintsoft)', numFg: fin ? 'var(--ink3)' : 'var(--tint)',
+        showBadge: !!b, bBg: b ? b.bg : '', bFg: b ? b.fg : '', bLabel: b ? b.l : '', bAn: b ? b.an : 'none',
+        open: () => this.openOrder(o.id),
+      };
+    });
+
+    const dO = orders.find(o => o.id === s.detailId);
+    let det = {};
+    if (dO) {
+      const m = SM[dO.status], k = this.kindFor(dO);
+      const sPill = k === 'conflict' ? { bg: 'var(--pursoft)', fg: 'var(--pur)', l: 'Needs a decision', an: 'none' }
+        : k === 'sending' ? { bg: 'var(--orsoft)', fg: 'var(--or)', l: 'Sending…', an: 'lmpulse 1s ease-in-out infinite' }
+        : k === 'failed' ? { bg: 'var(--redsoft)', fg: 'var(--red)', l: 'Server refused — retrying', an: 'none' }
+        : k === 'local' ? { bg: 'var(--orsoft)', fg: 'var(--or)', l: 'On this phone', an: 'none' }
+        : { bg: 'var(--fill)', fg: 'var(--ink2)', l: 'Synced', an: 'none' };
+      const u = dO.items.reduce((a, b) => a + b.q, 0), l = dO.items.length;
+      det = {
+        no: dO.no, name: dO.name, stop: dO.stop, status: dO.status, stDot: m.dot, stFg: m.fg, stBg: m.bg,
+        sBg: sPill.bg, sFg: sPill.fg, sLabel: sPill.l, sAn: sPill.an,
+        addr: dO.addr, addr2: dO.addr2, win: dO.win, phone: '+1 555 0' + (140 + dO.id),
+        hasNotes: !!dO.notes, notes: dO.notes, items: dO.items,
+        itemsLabel: u + (u === 1 ? ' unit' : ' units') + ' · ' + l + (l === 1 ? ' line' : ' lines'),
+        hasConflict: !!dO.conflict, cf: dO.conflict || {},
+        hist: dO.hist.map(h => ({
+          label: h.label, at: h.mins === 0 ? 'just now' : clock(h.mins, now),
+          dot: h.synced ? 'var(--fill2)' : 'var(--or)', an: !h.synced && s.syncing ? 'lmpulse 1s ease-in-out infinite' : 'none',
+          syncFg: h.synced ? 'var(--ink3)' : 'var(--or)',
+          syncLabel: h.synced ? 'On the server' : (s.conn === 'offline' ? 'On this phone — no signal to send it' : (s.syncing ? 'On this phone — sending now' : 'On this phone — waiting to send')),
+          hasDetail: !!h.detail, detail: h.detail,
+        })),
+      };
+    }
+
+    const ob = {
+      connTitle: s.syncing ? 'Sending now' : (s.conn === 'offline' ? 'No signal' : (failedQ.length ? 'Connected — a change was refused' : 'Connected')),
+      iconBg: s.conn === 'offline' ? 'var(--fill2)' : (failedQ.length ? 'var(--red)' : (s.syncing ? 'var(--or)' : (pending ? 'var(--or)' : 'var(--grn)'))),
+      iconFg: s.conn === 'offline' ? 'var(--ink2)' : '#fff',
+      iconCheck: !s.syncing && s.conn !== 'offline' && !failedQ.length && !pending,
+      iconArrow: !s.syncing && s.conn !== 'offline' && !failedQ.length && pending > 0,
+      iconBang: !s.syncing && s.conn !== 'offline' && failedQ.length > 0,
+      iconSlash: !s.syncing && s.conn === 'offline',
+      lastSync: s.lastSync ? ago(s.lastSync, now) : 'never on this device',
+      btnLabel: s.syncing ? 'Sending…' : (s.conn === 'offline' ? 'Try anyway' : (pending ? 'Sync ' + pending + ' now' : 'Check for changes')),
+      btnBg: s.conn === 'offline' || s.syncing ? 'var(--fill)' : 'var(--tint)',
+      btnFg: s.conn === 'offline' || s.syncing ? 'var(--ink2)' : '#fff',
+      hasConflicts: conflicts.length > 0,
+      conflictTitle: conflicts.length + (conflicts.length === 1 ? ' stop needs a decision' : ' stops need a decision'),
+      openConflict: () => conflicts.length && this.openOrder(conflicts[0].id),
+      hasQueue: pending > 0, queueCount: pending, caughtUp: pending === 0 && !conflicts.length,
+      caughtMeta: done + ' of ' + total + ' stops done. Photos have been cleared from the phone.',
+      queue: s.queue.map(q => {
+        const o = orders.find(x => x.id === q.oid) || { no: '—', name: '—' };
+        const failed = q.state === 'failed', sending = q.state === 'sending';
+        return { label: q.label, no: o.no, name: o.name,
+          waited: ago(q.since, now).replace(' ago', ''),
+          wFg: failed ? 'var(--red)' : 'var(--or)',
+          iBg: failed ? 'var(--redsoft)' : 'var(--orsoft)', iFg: failed ? 'var(--red)' : 'var(--or)',
+          an: sending ? 'lmpulse 1s ease-in-out infinite' : 'none',
+          isBang: failed, isArrow: !failed,
+          attempts: failed ? q.attempts + ' failed tries' : (sending ? 'sending' : 'waiting'),
+          hasReason: !!q.reason, reason: q.reason || '' };
+      }),
+    };
+
+    const sh = s.sheet, shO = orders.find(o => o.id === sh.oid) || {};
+    const sheet = {
+      open: sh.open, name: shO.name || '', no: shO.no || '', stop: shO.stop || 0,
+      choices: [['Delivered', 'Handed over, left safe, or signed for'], ['Failed', 'Couldn’t complete this stop'], ['In transit', 'On the way — not there yet'], ['Confirmed', 'Seen it, haven’t started']].map(o => {
+        const act = sh.status === o[0], m = SM[o[0]];
+        return { label: o[0], hint: o[1], on: () => this.pick(o[0]), sel: act, dot: m.dot, bg: act ? 'var(--fill)' : 'transparent' };
+      }),
+      needReason: sh.status === 'Failed',
+      reasons: REASONS.map(r => {
+        const act = sh.reason === r;
+        return { label: r, on: () => this.pickReason(r), bg: act ? 'var(--red)' : 'var(--card)', fg: act ? '#fff' : 'var(--ink)' };
+      }),
+      notes: sh.notes, recipient: sh.recipient,
+      needProof: sh.status === 'Delivered' || sh.status === 'Failed',
+      hasPhoto: sh.photo, noPhoto: !sh.photo,
+      saveLabel: sh.status ? (sh.status === 'Failed' ? 'Save — Couldn’t Deliver' : 'Save — ' + sh.status) : 'Pick what happened',
+      saveBg: sh.status ? 'var(--tint)' : 'var(--fill)', saveFg: sh.status ? '#fff' : 'var(--ink3)',
+      hint: s.conn === 'offline' ? 'No signal here. This saves on the phone and sends itself later.' : 'Saves on the phone first, then goes to the server.',
+    };
+
+    const ackSent = s.conn === 'online';
+    const ack = {
+      open: s.ack.open, title: 'Saved',
+      body: ackSent ? 'It’s written down on this phone where nothing can lose it. It’s on its way to the server now — you don’t have to wait.' : 'No signal here, so it stays with you. The moment you have a bar, it goes up on its own.',
+      pill: ackSent ? 'Sending to the server' : 'On this phone · will send itself',
+      pillBg: 'var(--orsoft)', pillFg: 'var(--or)',
+    };
+
+    const so = pending > 0
+      ? { title: pending + ' unsent ' + (pending === 1 ? 'change' : 'changes') + ' on this phone', body: 'Signing out clears the phone. Work that hasn’t reached the server would be lost — including photos. Stay signed in and it sends itself when you have signal.', plabel: 'Sign Out Anyway', pcol: 'var(--red)', pfont: '600 17px/1 -apple-system,sans-serif', cancelLabel: 'Stay Signed In', primary: () => { this.setState({ signOut: false }); this.flash('Held back. Nothing was deleted.'); } }
+      : { title: 'Sign out?', body: 'Everything you’ve done today is on the server. Nothing will be lost.', plabel: 'Sign Out', pcol: 'var(--red)', pfont: '400 17px/1 -apple-system,sans-serif', cancelLabel: 'Cancel', primary: () => { this.setState({ signOut: false }); this.flash('Signed out (prototype stays put).'); } };
+
+    const scen = [['shift', 'Mid-shift'], ['offline', 'Offline'], ['syncing', 'Syncing'], ['failed', 'Sync failed'], ['conflict', 'Conflict'], ['caught', 'All caught up'], ['empty', 'No route'], ['loading', 'Cold start']].map(x => ({ label: x[1], on: () => this.scenario(x[0]) }));
+    const themes = [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(t => {
+      const act = s.theme === t[0];
+      return { label: t[1], on: () => this.setState({ theme: t[0] }),
+        bg: act ? '#1C1C1E' : '#F5F5F7', fg: act ? '#fff' : '#1C1C1E', bd: act ? '#1C1C1E' : 'rgba(0,0,0,.09)',
+        pbg: act ? 'var(--card)' : 'transparent', pfg: 'var(--ink)', psh: act ? '0 1px 4px rgba(0,0,0,.12)' : 'none' };
+    });
+
+    return {
+      tm: dark ? 'dark' : 'light', isDark: dark, total,
+      onRoute: s.screen === 'route', onDetail: s.screen === 'detail' && !!dO, onOutbox: s.screen === 'outbox', onProfile: s.screen === 'profile',
+      strip, filters, visible,
+      prog: { frac: done + ' of ' + total, pct: total ? Math.round(done / total * 100) + '%' : '0%' },
+      emptyRoute: total === 0 && !s.loading,
+      emptyFilter: total > 0 && filtered.length === 0,
+      emptyFilterTitle: s.filter === 'Failed' ? 'No failed stops' : 'Nothing here right now',
+      emptyFilterBody: s.filter === 'Failed' ? 'Everything you’ve attempted today went through. You still have ' + counts.Pending + ' stops ahead.' : 'This is just a filter — your ' + total + ' stops are all still on the route.',
+      clearFilter: () => this.setState({ filter: 'all' }),
+      lastCheck: s.lastSync ? ago(s.lastSync, now) : 'just now',
+      det, ob, sheet, ack, so, signOut: s.signOut,
+      showUpdateCta: s.screen === 'detail' && !!dO && !dO.conflict && !sh.open && !s.ack.open,
+      openUpdate: this.openUpdate, closeSheet: this.closeSheet, saveUpdate: this.saveUpdate, dismissAck: this.dismissAck,
+      setNotes: this.setNotes, setRecipient: this.setRecipient, capturePhoto: this.capturePhoto,
+      keepMine: () => this.resolve('local'), keepServer: () => this.resolve('server'),
+      back: () => this.go('route'), goRoute: () => this.go('route'), goOutbox: () => this.go('outbox'), goProfile: () => this.go('profile'),
+      syncNow: this.syncNow, toggleConn: this.toggleConn, askSignOut: this.askSignOut, cancelSignOut: this.cancelSignOut, noop: () => {},
+      tabs: { route: s.screen === 'route' || s.screen === 'detail' ? 'var(--tint)' : 'var(--gray)', outbox: s.screen === 'outbox' ? 'var(--tint)' : 'var(--gray)', profile: s.screen === 'profile' ? 'var(--tint)' : 'var(--gray)' },
+      hasPending: pending > 0 || conflicts.length > 0,
+      badge: conflicts.length ? { bg: 'var(--pur)', n: '!' } : (failedQ.length ? { bg: 'var(--red)', n: String(pending) } : { bg: 'var(--or)', n: String(pending) }),
+      syncing: s.syncing, loading: s.loading, loadMsg: s.loadMsg,
+      skeleton: [0, 1, 2, 3, 4].map(i => ({ op: String(1 - i * 0.16), d: (i * 0.12) + 's' })),
+      hasToast: !!s.toast, toast: s.toast,
+      themeNote: s.theme === 'auto' ? 'Follows the phone — dark after sunset so the cab stays dark.' : (s.theme === 'dark' ? 'Locked dark. Easier at night.' : 'Locked light. Best in direct sun.'),
+      storage: { used: '82 MB', detail: '3 photos, 12 stops and 4 unsent changes', pct: '34%' },
+      scenarios: scen, themes,
+      connBtn: s.conn === 'online' ? { label: 'Signal: on — tap to drop it', bg: '#F5F5F7', bd: 'rgba(0,0,0,.09)', fg: '#1C1C1E' } : { label: 'Signal: off — tap to restore', bg: 'rgba(255,149,0,.12)', bd: '#E8850C', fg: '#B36A00' },
+      legend: [
+        { g: '↑', bg: 'rgba(255,149,0,.14)', fg: '#B36A00', t: 'To send', d: 'Saved on the phone. The server doesn’t have it yet.' },
+        { g: '…', bg: 'rgba(255,149,0,.14)', fg: '#B36A00', t: 'Sending', d: 'Going up right now.' },
+        { g: '!', bg: 'rgba(255,59,48,.12)', fg: '#D70015', t: 'Refused', d: 'Server said no. Retries on its own.' },
+        { g: '?', bg: 'rgba(175,82,222,.12)', fg: '#8944AB', t: 'Conflict', d: 'Two versions. You decide.' },
+        { g: '✓', bg: 'rgba(120,120,128,.12)', fg: '#6E6E73', t: 'Synced', d: 'No mark at all on the route. Done is quiet.' },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
