@@ -98,7 +98,7 @@ Driver, vehicle, depot, dispatch server, app version, pending sync count, a
 manual **Force Sync**, and a dark mode setting that overrides the device default
 and is remembered.
 
-![Settings/Profile](../screenshots/11-settings-profile.png)
+<img src="../screenshots/11-settings-profile.png" alt="Settings/Profile" width="340">
 
 ### The fifth screen: Outbox
 
