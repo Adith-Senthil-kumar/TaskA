@@ -8,7 +8,7 @@ build time, so the API has to exist first.
 | | |
 | --- | --- |
 | Web app | **https://adith-senthil-kumar.github.io/TaskA/** |
-| Mock API | **https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi** |
+| Mock API | **https://us-central1-busbuddy-1cb30.cloudfunctions.net/taskAMockApi** |
 
 ### The mock API, as a Cloud Function
 
@@ -30,20 +30,20 @@ Deploy it with:
 
 ```bash
 cd task-a-app
-firebase deploy --only functions:lastmile:lastmileMockApi
+firebase deploy --only functions:taska:taskAMockApi
 ```
 
 **Always deploy with that exact `--only` scope.** The target project also runs
 an unrelated live application with four functions of its own, plus Firestore
 rules and a Hosting site. A bare `firebase deploy` would consider all of those
 in scope. `firebase.json` deliberately declares *only* a functions block and
-puts this function in its own `lastmile` codebase, so both the config and the
+puts this function in its own `taska` codebase, so both the config and the
 command have to be wrong before anything else can be touched.
 
 Useful while demoing:
 
 ```bash
-API=https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi
+API=https://us-central1-busbuddy-1cb30.cloudfunctions.net/taskAMockApi
 
 curl -X POST $API/admin/reset                             # back to the 18 seeded stops
 curl -X POST $API/admin/offline -d '{"offline":true}' -H 'Content-Type: application/json'

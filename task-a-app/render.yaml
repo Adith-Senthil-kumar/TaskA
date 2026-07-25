@@ -8,7 +8,7 @@
 # No build step: the server is Node standard library only, by design.
 services:
   - type: web
-    name: lastmile-mock-api
+    name: task-a-mock-api
     runtime: node
     plan: free
     buildCommand: "echo 'no build step required'"

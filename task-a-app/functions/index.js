@@ -24,7 +24,7 @@ const db = getFirestore();
 // Namespaced deliberately. This function is a guest in a project that runs a
 // real app, and nothing here may collide with it or trip its Firestore
 // triggers, which are scoped to other collections.
-const STATE_DOC = db.collection('lastmile_mock').doc('state');
+const STATE_DOC = db.collection('taska_mock').doc('state');
 
 const LATENCY_MS = Number(process.env.LATENCY_MS ?? 0);
 const FAILURE_RATE = Number(process.env.FAILURE_RATE ?? 0.08);
@@ -68,7 +68,7 @@ function remember(state, key, outcome) {
   }
 }
 
-exports.lastmileMockApi = onRequest(
+exports.taskAMockApi = onRequest(
   { region: 'us-central1', cors: true, maxInstances: 3, memory: '256MiB' },
   async (req, res) => {
     const path = req.path.replace(/\/+$/, '') || '/';

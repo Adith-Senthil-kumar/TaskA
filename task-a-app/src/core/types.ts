@@ -1,5 +1,5 @@
 /**
- * Domain types for Lastmile.
+ * Domain types for Task A.
  *
  * Nothing in src/core imports React or React Native. The whole offline/sync
  * layer is plain TypeScript behind the ports in ./ports.ts, which is why the

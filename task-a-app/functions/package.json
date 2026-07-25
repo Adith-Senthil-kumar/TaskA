@@ -1,6 +1,6 @@
 {
-  "name": "lastmile-mock-api-function",
-  "description": "Cloud Function deployment of the Lastmile mock order API",
+  "name": "task-a-mock-api-function",
+  "description": "Cloud Function deployment of the Task A mock order API",
   "private": true,
   "main": "index.js",
   "engines": {

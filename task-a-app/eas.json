@@ -11,7 +11,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi"
+        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/taskAMockApi"
       }
     },
     "production": {
@@ -20,7 +20,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi"
+        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/taskAMockApi"
       }
     }
   },

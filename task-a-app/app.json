@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Lastmile",
+    "name": "Task A",
     "slug": "TaskA",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,7 +25,7 @@
       "output": "single",
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "lastmile",
+    "scheme": "taska",
     "experiments": {
       "baseUrl": "/TaskA"
     },

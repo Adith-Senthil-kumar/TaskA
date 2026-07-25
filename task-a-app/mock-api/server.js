@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Mock order API for Lastmile.
+ * Mock order API for Task A.
  *
  * Written with the Node standard library only so `npm run mock-api` works
  * without a second install step.
@@ -150,7 +150,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Lastmile mock API on http://localhost:${PORT}`);
+  console.log(`Task A mock API on http://localhost:${PORT}`);
   console.log(`  latency ${LATENCY_MS}-${LATENCY_MS * 2}ms, failure rate ${FAILURE_RATE}`);
   console.log(`  POST /admin/offline            {"offline":true}  simulate an outage`);
   console.log(`  POST /admin/reset                                back to the seeded shift`);
