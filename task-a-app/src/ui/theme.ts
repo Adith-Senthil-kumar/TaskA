@@ -1,4 +1,5 @@
 import { useColorScheme } from 'react-native';
+import { useAppStore } from '../store/useAppStore';
 
 /**
  * Design tokens, ported from the "Calm by default" prototype.
@@ -89,7 +90,20 @@ const dark: Palette = {
  * approximate on the other is worse than one that looks deliberate on both.
  */
 export function usePalette(): Palette {
-  return useColorScheme() === 'dark' ? dark : light;
+  return useIsDark() ? dark : light;
+}
+
+/**
+ * The device setting is the default, not the rule. A driver working nights in a
+ * van holds their phone somewhere the OS schedule does not know about, so the
+ * app lets them override it and remembers the answer.
+ */
+export function useIsDark(): boolean {
+  const system = useColorScheme();
+  const preference = useAppStore((s) => s.theme);
+  if (preference === 'dark') return true;
+  if (preference === 'light') return false;
+  return system === 'dark';
 }
 
 export const radius = { chip: 13, card: 14, control: 12, sheet: 20 } as const;

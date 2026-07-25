@@ -20,6 +20,10 @@ import { getRuntime, initRuntime } from '../app/runtime';
 
 type Filter = OrderStatus | 'all';
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+
+const THEME_KEY = 'theme_preference';
+
 interface AppState {
   ready: boolean;
   loading: boolean;
@@ -30,6 +34,8 @@ interface AppState {
   filter: Filter;
   /** Free-text search over customer, reference and address. */
   query: string;
+  /** 'system' follows the device. The other two override it. */
+  theme: ThemePreference;
   sync: SyncStatus | null;
 
   bootstrap: () => Promise<void>;
@@ -37,6 +43,7 @@ interface AppState {
   syncNow: () => Promise<void>;
   setFilter: (filter: Filter) => void;
   setQuery: (query: string) => void;
+  setTheme: (theme: ThemePreference) => void;
   updateStatus: (input: StatusChangeInput) => Promise<void>;
   resolveReview: (orderId: string, chosen: OrderStatus) => Promise<void>;
 }
@@ -49,6 +56,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   queue: [],
   filter: 'all',
   query: '',
+  theme: 'system',
   sync: null,
 
   bootstrap: async () => {
@@ -63,6 +71,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         void get().refresh();
       });
       set({ ready: true });
+      const saved = await getRuntime().store.getSetting(THEME_KEY);
+      if (saved === 'light' || saved === 'dark' || saved === 'system') set({ theme: saved });
       await get().refresh();
       // Fire and forget: the driver can work from local data immediately and
       // does not wait on the network to see today's route.
@@ -92,6 +102,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   setFilter: (filter) => set({ filter }),
 
   setQuery: (query) => set({ query }),
+
+  setTheme: (theme) => {
+    set({ theme });
+    // Persisted so the choice survives a force-quit, like everything else here.
+    void getRuntime().store.setSetting(THEME_KEY, theme);
+  },
 
   updateStatus: async (input) => {
     const { engine } = getRuntime();

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Constants from 'expo-constants';
-import { useAppStore } from '../../src/store/useAppStore';
-import { Button, Card } from '../../src/ui/components';
-import { usePalette } from '../../src/ui/theme';
+import { useAppStore, type ThemePreference } from '../../src/store/useAppStore';
+import { Button, Card, FooterCredit } from '../../src/ui/components';
+import { radius, usePalette } from '../../src/ui/theme';
 import { API_BASE_URL } from '../../src/app/runtime';
 
 /**
@@ -17,6 +17,8 @@ export default function ProfileScreen() {
   const pending = useAppStore((s) => s.sync?.pendingCount ?? 0);
   const syncNow = useAppStore((s) => s.syncNow);
   const sync = useAppStore((s) => s.sync);
+  const theme = useAppStore((s) => s.theme);
+  const setTheme = useAppStore((s) => s.setTheme);
   const [syncing, setSyncing] = useState(false);
 
   const offline = sync?.connection === 'offline';
@@ -53,7 +55,8 @@ export default function ProfileScreen() {
   return (
     <ScrollView style={{ backgroundColor: palette.bg }} contentContainerStyle={{ paddingBottom: 40 }}>
       <Card>
-        <View style={styles.identity}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>User information</Text>
+        <View style={[styles.identity, { marginTop: 12 }]}>
           <View style={[styles.avatar, { backgroundColor: palette.tintsoft }]}>
             <Text style={[styles.initials, { color: palette.tint }]}>DK</Text>
           </View>
@@ -74,7 +77,7 @@ export default function ProfileScreen() {
       <Card>
         <View style={styles.pendingRow}>
           <View style={styles.flex}>
-            <Text style={[styles.sectionTitle, { color: palette.ink }]}>Pending sync</Text>
+            <Text style={[styles.sectionTitle, { color: palette.ink }]}>Pending sync count</Text>
             <Text style={[styles.sectionSub, { color: palette.ink2 }]}>
               {pending === 0
                 ? 'Nothing is waiting. Every change has reached the server.'
@@ -101,19 +104,45 @@ export default function ProfileScreen() {
         </View>
       </Card>
 
+      <Card>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>Dark mode</Text>
+        <Text style={[styles.sectionSub, { color: palette.ink2 }]}>
+          Follows the phone unless you say otherwise. A van at night is darker than
+          any schedule knows.
+        </Text>
+        <View style={[styles.segmented, { borderColor: palette.sep }]}>
+          {(['system', 'light', 'dark'] as ThemePreference[]).map((option) => {
+            const active = theme === option;
+            return (
+              <Pressable
+                key={option}
+                onPress={() => setTheme(option)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: active }}
+                style={[
+                  styles.segment,
+                  { backgroundColor: active ? palette.tint : 'transparent' },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentLabel,
+                    { color: active ? '#FFFFFF' : palette.ink2 },
+                  ]}
+                >
+                  {option === 'system' ? 'System' : option === 'light' ? 'Light' : 'Dark'}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Card>
+
       <View style={styles.footer}>
         <Button label="Sign out" variant={pending > 0 ? 'secondary' : 'destructive'} onPress={signOut} />
       </View>
 
-      <Pressable
-        accessibilityRole="link"
-        onPress={() => void Linking.openURL('https://digitalheroesco.com')}
-        style={styles.credit}
-      >
-        <Text style={[styles.creditText, { color: palette.ink3 }]}>
-          Built for Digital Heroes Training Task
-        </Text>
-      </Pressable>
+      <FooterCredit />
     </ScrollView>
   );
 }
@@ -143,6 +172,13 @@ const styles = StyleSheet.create({
   pendingCount: { fontSize: 30, fontWeight: '700', fontVariant: ['tabular-nums'], lineHeight: 34 },
   sectionSub: { fontSize: 13, marginTop: 4, lineHeight: 19 },
   footer: { paddingHorizontal: 16, paddingTop: 24 },
-  credit: { paddingTop: 28, paddingBottom: 8, alignItems: 'center' },
-  creditText: { fontSize: 12, textDecorationLine: 'underline' },
+  segmented: {
+    flexDirection: 'row',
+    marginTop: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.control,
+    overflow: 'hidden',
+  },
+  segment: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 11 },
+  segmentLabel: { fontSize: 14.5, fontWeight: '600' },
 });

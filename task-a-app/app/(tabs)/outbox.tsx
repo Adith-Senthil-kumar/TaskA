@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
 import { selectReviewOrders, useAppStore } from '../../src/store/useAppStore';
-import { Button, Card, Loading, Pill } from '../../src/ui/components';
+import { Button, Card, FooterCredit, Loading, Pill } from '../../src/ui/components';
 import { usePalette } from '../../src/ui/theme';
 import { STATUS_LABELS } from '../../src/core/statusMachine';
 
@@ -135,6 +135,8 @@ export default function OutboxScreen() {
           })}
         </Card>
       )}
+
+      <FooterCredit />
     </ScrollView>
   );
 }

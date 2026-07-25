@@ -283,6 +283,26 @@ export class SqliteStore implements LocalStore {
     );
   }
 
+  /**
+   * UI preferences, kept on the existing meta table. These are intentionally
+   * absent from the LocalStore port: the sync engine has no business knowing
+   * the driver picked a light theme.
+   */
+  async getSetting(key: string): Promise<string | null> {
+    const row = await this.db.getFirstAsync<{ value: string }>(
+      'SELECT value FROM meta WHERE key = ?',
+      key,
+    );
+    return row ? row.value : null;
+  }
+
+  async setSetting(key: string, value: string): Promise<void> {
+    await this.db.runAsync(
+      'INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
+      [key, value],
+    );
+  }
+
   async getWatermark(): Promise<number | null> {
     const row = await this.db.getFirstAsync<{ value: string }>(
       "SELECT value FROM meta WHERE key = 'watermark'",

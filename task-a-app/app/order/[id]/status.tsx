@@ -3,7 +3,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAppStore } from '../../../src/store/useAppStore';
-import { Button, EmptyState } from '../../../src/ui/components';
+import { Button, EmptyState, FooterCredit } from '../../../src/ui/components';
 import { radius, usePalette } from '../../../src/ui/theme';
 import { STATUS_LABELS, allowedNextStatuses } from '../../../src/core/statusMachine';
 import type { FailureReason, OrderStatus } from '../../../src/core/types';
@@ -143,7 +143,7 @@ export default function StatusUpdateScreen() {
 
       <View style={styles.footer}>
         <Button
-          label={saving ? 'Saving…' : 'Save'}
+          label={saving ? 'Saving…' : 'Save changes'}
           variant="primary"
           onPress={save}
           disabled={!canSave || saving}
@@ -160,6 +160,8 @@ export default function StatusUpdateScreen() {
             : 'Saves on the phone first, then sends.'}
         </Text>
       </View>
+
+      <FooterCredit />
     </ScrollView>
   );
 }

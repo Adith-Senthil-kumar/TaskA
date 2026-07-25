@@ -3,6 +3,8 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  Linking,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -362,4 +364,57 @@ const styles = StyleSheet.create({
   emptyTitle: { fontSize: 17, fontWeight: '600', marginBottom: 6, textAlign: 'center' },
   emptyBody: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
   emptyAction: { marginTop: 18, alignSelf: 'stretch' },
+});
+
+export const CREDIT_TEXT = 'Built for Digital Heroes Training Task';
+export const CREDIT_URL = 'https://digitalheroesco.com';
+
+/**
+ * The attribution required by the brief. It appears on every screen rather than
+ * only on Profile, because the requirement is about the page a reviewer happens
+ * to open, and on web every route is a page someone can land on directly.
+ *
+ * On web it renders a real anchor so the destination is visible on hover and
+ * survives being right-clicked; elsewhere it is a Pressable that opens the same
+ * URL. Both paths are the same line of text.
+ */
+export function FooterCredit({ compact = false }: { compact?: boolean } = {}) {
+  const palette = usePalette();
+  const open = () => void Linking.openURL(CREDIT_URL);
+
+  const label = (
+    <Text style={[creditStyles.text, { color: palette.ink3 }]}>{CREDIT_TEXT}</Text>
+  );
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={[creditStyles.wrap, compact && creditStyles.compact]}>
+        <Text
+          accessibilityRole="link"
+          // RNW turns `href` into a real <a>. Not in the React Native Text
+          // types, which is why this is cast rather than spread blindly.
+          {...({ href: CREDIT_URL, hrefAttrs: { rel: 'noopener', target: '_blank' } } as object)}
+          style={[creditStyles.text, { color: palette.ink3 }]}
+        >
+          {CREDIT_TEXT}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="link"
+      onPress={open}
+      style={[creditStyles.wrap, compact && creditStyles.compact]}
+    >
+      {label}
+    </Pressable>
+  );
+}
+
+const creditStyles = StyleSheet.create({
+  wrap: { paddingTop: 24, paddingBottom: 12, alignItems: 'center' },
+  compact: { paddingTop: 10, paddingBottom: 10 },
+  text: { fontSize: 12, textDecorationLine: 'underline', textAlign: 'center' },
 });

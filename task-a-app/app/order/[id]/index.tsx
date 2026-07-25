@@ -3,7 +3,16 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAppStore } from '../../../src/store/useAppStore';
 import { getRuntime } from '../../../src/app/runtime';
-import { Button, Card, EmptyState, Loading, Pill, Row, StatusLine } from '../../../src/ui/components';
+import {
+  Button,
+  Card,
+  EmptyState,
+  FooterCredit,
+  Loading,
+  Pill,
+  Row,
+  StatusLine,
+} from '../../../src/ui/components';
 import { usePalette } from '../../../src/ui/theme';
 import { detailPill, syncKindFor } from '../../../src/ui/syncKind';
 import { STATUS_LABELS, allowedNextStatuses } from '../../../src/core/statusMachine';
@@ -101,6 +110,8 @@ export default function OrderDetailScreen() {
       ) : null}
 
       <Card>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>Customer details</Text>
+        <Row label="Name" value={order.customerName} />
         <Row label="Address" value={`${order.address}`} />
         <Row label="Window · Phone" value={`${order.deliveryWindow} · ${order.customerPhone}`} />
         {order.notes ? (
@@ -113,13 +124,13 @@ export default function OrderDetailScreen() {
 
       <Card>
         <Row label="Order status" value={STATUS_LABELS[order.status]} />
-        <Row label="Created" value={formatStamp(order.createdAt)} />
+        <Row label="Created date" value={formatStamp(order.createdAt)} />
         <Row label="Last sync time" value={lastSync} />
       </Card>
 
       <Card>
         <Text style={[styles.sectionTitle, { color: palette.ink }]}>
-          Products · {items} {items === 1 ? 'item' : 'items'}
+          Product list · {items} {items === 1 ? 'item' : 'items'}
         </Text>
         {order.items.map((item) => (
           <View key={item.sku} style={styles.itemRow}>
@@ -176,6 +187,8 @@ export default function OrderDetailScreen() {
           </Text>
         )}
       </View>
+
+      <FooterCredit />
     </ScrollView>
   );
 }

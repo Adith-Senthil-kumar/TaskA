@@ -7,6 +7,7 @@ import { selectCounts, selectVisibleOrders, useAppStore } from '../../src/store/
 import {
   EmptyState,
   FilterChip,
+  FooterCredit,
   Loading,
   Separator,
   StatusCard,
@@ -50,7 +51,7 @@ export default function RouteScreen() {
         data={orders}
         keyExtractor={(order) => order.id}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 8 }}
         refreshControl={
           <RefreshControl refreshing={sync?.phase === 'syncing'} onRefresh={syncNow} tintColor={palette.ink3} />
         }
@@ -91,6 +92,22 @@ export default function RouteScreen() {
                   <Ionicons name="close-circle" size={17} color={palette.ink3} />
                 </Pressable>
               ) : null}
+            </View>
+
+            <View style={styles.toolbar}>
+              <Text style={[styles.toolbarLabel, { color: palette.ink2 }]}>
+                Search/Filter
+              </Text>
+              <Pressable
+                onPress={syncNow}
+                accessibilityRole="button"
+                accessibilityLabel="Refresh"
+                hitSlop={8}
+                style={styles.refresh}
+              >
+                <Ionicons name="refresh" size={15} color={palette.tint} />
+                <Text style={[styles.refreshLabel, { color: palette.tint }]}>Refresh</Text>
+              </Pressable>
             </View>
 
             <View style={styles.filters}>
@@ -136,6 +153,8 @@ export default function RouteScreen() {
           <OrderRow order={item} index={index} queue={queue} sync={sync} />
         )}
       />
+
+      <FooterCredit compact />
     </View>
   );
 }
@@ -260,12 +279,22 @@ const styles = StyleSheet.create({
   headline: { flexDirection: 'row', alignItems: 'baseline', gap: 8, paddingHorizontal: 16, paddingTop: 12 },
   progress: { fontSize: 34, fontWeight: '700', letterSpacing: -1, fontVariant: ['tabular-nums'] },
   progressLabel: { fontSize: 15 },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  toolbarLabel: { fontSize: 12.5, fontWeight: '600', letterSpacing: 0.3, textTransform: 'uppercase' },
+  refresh: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  refreshLabel: { fontSize: 14, fontWeight: '600' },
   searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginHorizontal: 16,
-    marginTop: 16,
+    marginTop: 10,
     paddingHorizontal: 12,
     height: 40,
     borderRadius: 10,
