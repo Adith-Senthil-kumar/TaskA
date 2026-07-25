@@ -7,9 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adithsenthilkumar.lastmile"
     },
     "android": {
+      "package": "com.adithsenthilkumar.lastmile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -34,6 +36,21 @@
           "root": "./app"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {
+        "root": "./app"
+      },
+      "eas": {
+        "projectId": "f18bab1c-b865-488a-969b-9527349131f1"
+      }
+    },
+    "owner": "adith7301",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f18bab1c-b865-488a-969b-9527349131f1"
+    }
   }
 }

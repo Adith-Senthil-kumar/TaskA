@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 20.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://us-central1-busbuddy-1cb30.cloudfunctions.net/lastmileMockApi"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

@@ -144,6 +144,41 @@ or drag `dist/` onto app.netlify.com/drop, or `npx vercel --prod dist`.
 like `/outbox` will 404 on refresh. Netlify and Vercel both do this
 automatically for SPA output. For GitHub Pages, copy `index.html` to `404.html`.
 
+## The phone build
+
+The app is a phone app, and the web build is a demo surface rather than the
+thing itself. The Android build is what a reviewer should actually install.
+
+```bash
+eas build --platform android --profile preview
+```
+
+The `preview` profile in `eas.json` produces an **APK** with internal
+distribution, which is what makes the install page work: EAS returns a page
+with a QR code and a direct download, so a reviewer scans it, installs, and
+runs the real app. No Expo account and no Expo Go on their side.
+
+`EXPO_PUBLIC_API_URL` is baked in from the profile's `env` block, so the
+installed app talks to the hosted mock API rather than localhost.
+
+**Expo Go will not load this project.** Every native module it uses is in Expo
+Go's bundled set, so the code would run — but the project is configured for EAS
+Update with an `appVersion` runtime policy, and Expo Go asks for
+`exposdk:57.0.0`. The manifest endpoint answers `204 No Content` to that, which
+is correct: those are different runtimes and serving one to the other is how you
+get a crash that looks like a bug in the app. The APK is the honest artifact.
+
+iOS is not built here. An `.ipa` that installs on someone else's iPhone needs a
+paid Apple Developer account for ad-hoc provisioning or TestFlight, and there
+isn't one. iOS reviewers get the web build.
+
+Over-the-air updates are wired up on the `preview` channel, so a JS-only change
+can be shipped to an already-installed APK without rebuilding:
+
+```bash
+eas update --branch preview --environment preview --message "..."
+```
+
 ## 3. Check before sending
 
 - Open the live URL in a private window — the route list should populate
